@@ -1,0 +1,32 @@
+# Dependencias
+node_modules/
+package-lock.json
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Expo y compilados
+.expo/
+.expo-shared/
+dist/
+web-build/
+
+# Entornos y claves
+.env
+.env*.local
+
+# Documentación interna de desarrollo y guías
+ESPECIFICACION_ARQUITECTURA.md
+ESPECIFICACION_SISTEMA_OPS_HUB.md
+GUIA_POC_MOVIL.md
+DESIGN.md
+stitch_designs/
+**/AGENTS.md
+**/.claude/
+.stitch-mcp/
+
+# macOS y Windows
+.DS_Store
+Thumbs.db
+*.log
+.system_generated/
