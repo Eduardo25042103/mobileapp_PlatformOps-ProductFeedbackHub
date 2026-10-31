@@ -10,6 +10,7 @@ import {
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
+import { TriangleAlert } from 'lucide-react-native';
 import { AppStackParamList } from '../types/navigation';
 import { useAuth } from '../context/AuthContext';
 import { Button } from '../components/Button';
@@ -91,7 +92,9 @@ export const HomeScreen: React.FC = () => {
 
         {/* Critical Maintenance / Incident Banner */}
         <View style={styles.alertBanner}>
-          <Text style={styles.alertIcon}>⚠️</Text>
+          <View style={styles.alertIcon}>
+            <TriangleAlert color="#F59E0B" size={20} />
+          </View>
           <View style={{ flex: 1 }}>
             <Text style={styles.alertTitle}>Mantenimiento Programado</Text>
             <Text style={styles.alertDesc}>
@@ -258,7 +261,7 @@ const styles = StyleSheet.create({
     gap: 10,
   },
   alertIcon: {
-    fontSize: 20,
+    marginTop: 1,
   },
   alertTitle: {
     color: '#F59E0B',
