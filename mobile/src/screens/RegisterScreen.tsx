@@ -22,6 +22,7 @@ import { Department } from '../types/auth';
 import { useAuth } from '../context/AuthContext';
 import { InputText } from '../components/InputText';
 import { Button } from '../components/Button';
+import { Code, Headset, LucideIcon, Megaphone, TrendingUp } from 'lucide-react-native';
 
 const registerSchema = z.object({
   nombre: z.string().min(3, 'El nombre debe tener al menos 3 caracteres'),
@@ -34,11 +35,11 @@ type RegisterFormData = z.infer<typeof registerSchema>;
 
 type RegisterNavigationProp = NativeStackNavigationProp<AuthStackParamList, 'Register'>;
 
-const DEPARTMENTS: { id: Department; label: string; icon: string; desc: string }[] = [
-  { id: 'TI_DESARROLLO', label: 'TI / Desarrollo', icon: '💻', desc: 'Resolución de fallos y logs' },
-  { id: 'SOPORTE', label: 'Soporte Técnico', icon: '🎧', desc: 'Recepción y escalación de tickets' },
-  { id: 'VENTAS', label: 'Ventas SaaS', icon: '📈', desc: 'Canalización de pedidos y clientes' },
-  { id: 'MARKETING', label: 'Marketing / Prod', icon: '📢', desc: 'Changelogs y comunicados' },
+const DEPARTMENTS: { id: Department; label: string; icon: LucideIcon; desc: string }[] = [
+  { id: 'TI_DESARROLLO', label: 'TI / Desarrollo', icon: Code, desc: 'Resolución de fallos y logs' },
+  { id: 'SOPORTE', label: 'Soporte Técnico', icon: Headset, desc: 'Recepción y escalación de tickets' },
+  { id: 'VENTAS', label: 'Ventas SaaS', icon: TrendingUp, desc: 'Canalización de pedidos y clientes' },
+  { id: 'MARKETING', label: 'Marketing / Prod', icon: Megaphone, desc: 'Changelogs y comunicados' },
 ];
 
 export const RegisterScreen: React.FC = () => {
@@ -160,7 +161,9 @@ export const RegisterScreen: React.FC = () => {
                       style={[styles.deptCard, isSelected && styles.deptCardSelected]}
                       onPress={() => setValue('departamento', dept.id)}
                     >
-                      <Text style={styles.deptIcon}>{dept.icon}</Text>
+                      <View style={styles.deptIcon}>
+                        <dept.icon color={isSelected ? '#818CF8' : '#94A3B8'} size={20} />
+                      </View>
                       <Text
                         style={[styles.deptName, isSelected && styles.deptNameSelected]}
                       >
@@ -250,8 +253,7 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgba(99, 102, 241, 0.12)',
   },
   deptIcon: {
-    fontSize: 18,
-    marginBottom: 4,
+    marginBottom: 6,
   },
   deptName: {
     fontSize: 13,
