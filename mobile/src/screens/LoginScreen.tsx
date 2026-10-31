@@ -15,6 +15,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { useForm, Controller } from 'react-hook-form';
+import { Zap } from 'lucide-react-native';
 import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { AuthStackParamList } from '../types/navigation';
@@ -79,7 +80,7 @@ export const LoginScreen: React.FC = () => {
             {/* Brand Header */}
             <View style={styles.header}>
               <View style={styles.logoBadge}>
-                <Text style={styles.logoIcon}>⚡</Text>
+                <Zap color="#06B6D4" size={24} strokeWidth={2} />
               </View>
               <Text style={styles.systemTitle}>Platform Ops Hub</Text>
               <Text style={styles.systemSubtitle}>
@@ -141,9 +142,12 @@ export const LoginScreen: React.FC = () => {
                   setValue('password', 'password123');
                 }}
               >
-                <Text style={styles.quickFillText}>
-                  ⚡ Autocompletar cuenta demo (Alex Vance - TI)
-                </Text>
+                <View style={styles.quickFillContent}>
+                  <Zap color="#818CF8" size={14} />
+                  <Text style={styles.quickFillText}>
+                      Autocompletar cuenta demo (Alex Vance - TI)
+                  </Text>
+                </View>
               </TouchableOpacity>
             </View>
 
@@ -186,9 +190,6 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: '#334155',
     marginBottom: 12,
-  },
-  logoIcon: {
-    fontSize: 24,
   },
   systemTitle: {
     fontSize: 22,
@@ -235,6 +236,11 @@ const styles = StyleSheet.create({
     color: '#818CF8',
     fontSize: 12,
     fontWeight: '600',
+  },
+  quickFillContent: {
+  flexDirection: 'row',
+  alignItems: 'center',
+  gap: 6,
   },
   footer: {
     flexDirection: 'row',
