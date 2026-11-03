@@ -12,12 +12,39 @@ import {
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
+import {
+  Search,
+  X,
+  ArrowLeft,
+  CircleAlert,
+  TriangleAlert,
+  FlaskConical,
+  CheckCircle2,
+  FolderOpen,
+  Plus,
+  LucideIcon,
+} from 'lucide-react-native';
 import { AppStackParamList } from '../types/navigation';
 import { Ticket, TicketPriority, TicketStatus } from '../types/ticket';
 import { ticketsApi } from '../api/ticketsApi';
 import { TicketCard } from '../components/TicketCard';
 
 type TicketListNavigationProp = NativeStackNavigationProp<AppStackParamList, 'TicketList'>;
+
+interface FilterOption {
+  id: 'ALL' | 'P1' | 'P2' | 'EN_DIAGNOSTICO' | 'RESUELTO';
+  label: string;
+  icon?: LucideIcon;
+  iconColor?: string;
+}
+
+const FILTER_OPTIONS: FilterOption[] = [
+  { id: 'ALL', label: 'Todos' },
+  { id: 'P1', label: 'P1 Críticos', icon: CircleAlert, iconColor: '#EF4444' },
+  { id: 'P2', label: 'P2 Alta', icon: TriangleAlert, iconColor: '#F59E0B' },
+  { id: 'EN_DIAGNOSTICO', label: 'En Diagnóstico', icon: FlaskConical, iconColor: '#818CF8' },
+  { id: 'RESUELTO', label: 'Resueltos', icon: CheckCircle2, iconColor: '#10B981' },
+];
 
 export const TicketListScreen: React.FC = () => {
   const navigation = useNavigation<TicketListNavigationProp>();
@@ -80,13 +107,14 @@ export const TicketListScreen: React.FC = () => {
           style={styles.backButton}
           onPress={() => navigation.navigate('Home')}
         >
-          <Text style={styles.backButtonText}>← Inicio</Text>
+          <ArrowLeft size={13} color="#818CF8" />
+          <Text style={styles.backButtonText}>Inicio</Text>
         </TouchableOpacity>
       </View>
 
       {/* Search Input */}
       <View style={styles.searchContainer}>
-        <Text style={styles.searchIcon}>🔍</Text>
+        <Search size={15} color="#64748B" style={styles.searchIcon} />
         <TextInput
           style={styles.searchInput}
           placeholder="Buscar por código (#TK-...), cliente o título..."
@@ -97,7 +125,7 @@ export const TicketListScreen: React.FC = () => {
         />
         {searchQuery.length > 0 && (
           <TouchableOpacity onPress={() => setSearchQuery('')}>
-            <Text style={styles.clearText}>✕</Text>
+            <X size={15} color="#94A3B8" />
           </TouchableOpacity>
         )}
       </View>
@@ -107,21 +135,22 @@ export const TicketListScreen: React.FC = () => {
         <FlatList
           horizontal
           showsHorizontalScrollIndicator={false}
-          data={[
-            { id: 'ALL', label: 'Todos' },
-            { id: 'P1', label: '🚨 P1 Críticos' },
-            { id: 'P2', label: '⚠️ P2 Alta' },
-            { id: 'EN_DIAGNOSTICO', label: '🔬 En Diagnóstico' },
-            { id: 'RESUELTO', label: '✅ Resueltos' },
-          ]}
+          data={FILTER_OPTIONS}
           keyExtractor={(item) => item.id}
           renderItem={({ item }) => {
             const isSelected = selectedFilter === item.id;
+            const IconComp = item.icon;
             return (
               <TouchableOpacity
                 style={[styles.chip, isSelected && styles.chipSelected]}
-                onPress={() => setSelectedFilter(item.id as any)}
+                onPress={() => setSelectedFilter(item.id)}
               >
+                {IconComp && (
+                  <IconComp
+                    size={12}
+                    color={isSelected ? '#818CF8' : item.iconColor || '#94A3B8'}
+                  />
+                )}
                 <Text
                   style={[styles.chipText, isSelected && styles.chipTextSelected]}
                 >
@@ -154,7 +183,9 @@ export const TicketListScreen: React.FC = () => {
           }
           ListEmptyComponent={
             <View style={styles.emptyContainer}>
-              <Text style={styles.emptyIcon}>📂</Text>
+              <View style={styles.emptyIconContainer}>
+                <FolderOpen size={36} color="#64748B" />
+              </View>
               <Text style={styles.emptyTitle}>No hay tickets para este filtro</Text>
               <Text style={styles.emptySubtitle}>
                 Prueba ajustando el criterio de búsqueda o seleccionando otro filtro.
@@ -178,7 +209,7 @@ export const TicketListScreen: React.FC = () => {
         activeOpacity={0.8}
         onPress={() => navigation.navigate('TicketForm')}
       >
-        <Text style={styles.fabIcon}>+</Text>
+        <Plus size={24} color="#FFFFFF" strokeWidth={2.5} />
       </TouchableOpacity>
     </SafeAreaView>
   );
@@ -211,6 +242,9 @@ const styles = StyleSheet.create({
     marginTop: 2,
   },
   backButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 5,
     backgroundColor: '#1E293B',
     paddingHorizontal: 10,
     paddingVertical: 6,
@@ -235,7 +269,6 @@ const styles = StyleSheet.create({
     paddingHorizontal: 12,
   },
   searchIcon: {
-    fontSize: 14,
     marginRight: 8,
   },
   searchInput: {
@@ -254,6 +287,9 @@ const styles = StyleSheet.create({
     paddingLeft: 20,
   },
   chip: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 5,
     backgroundColor: '#1E293B',
     paddingHorizontal: 12,
     paddingVertical: 6,
@@ -293,8 +329,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     paddingVertical: 60,
   },
-  emptyIcon: {
-    fontSize: 40,
+  emptyIconContainer: {
     marginBottom: 12,
   },
   emptyTitle: {
@@ -324,11 +359,5 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.4,
     shadowRadius: 8,
     elevation: 6,
-  },
-  fabIcon: {
-    color: '#FFFFFF',
-    fontSize: 28,
-    fontWeight: '300',
-    marginTop: -2,
   },
 });

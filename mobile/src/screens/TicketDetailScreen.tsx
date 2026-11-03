@@ -14,6 +14,7 @@ import {
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRoute, useNavigation, RouteProp } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
+import { ArrowLeft, ArrowRight, Paperclip, RefreshCw, TriangleAlert, Zap } from 'lucide-react-native';
 import { AppStackParamList } from '../types/navigation';
 import { Ticket, TicketStatus } from '../types/ticket';
 import { ticketsApi } from '../api/ticketsApi';
@@ -118,7 +119,8 @@ export const TicketDetailScreen: React.FC = () => {
           style={styles.backButton}
           onPress={() => navigation.goBack()}
         >
-          <Text style={styles.backButtonText}>← Volver</Text>
+          <ArrowLeft size={13} color="#818CF8" />
+          <Text style={styles.backButtonText}>Volver</Text>
         </TouchableOpacity>
 
         <View style={styles.headerRight}>
@@ -188,9 +190,12 @@ export const TicketDetailScreen: React.FC = () => {
                 resizeMode="cover"
               />
               <View style={styles.attachmentFooter}>
-                <Text style={styles.attachmentName}>
-                  📎 {ticket.adjuntos[0].nombreArchivo}
-                </Text>
+                <View style={styles.attachmentNameRow}>
+                  <Paperclip size={13} color="#94A3B8" />
+                  <Text style={styles.attachmentName}>
+                    {ticket.adjuntos[0].nombreArchivo}
+                  </Text>
+                </View>
                 <Text style={styles.attachmentSize}>
                   {(ticket.adjuntos[0].tamanoBytes / 1024).toFixed(0)} KB • URL Prefirmada
                 </Text>
@@ -254,8 +259,9 @@ export const TicketDetailScreen: React.FC = () => {
             activeOpacity={0.8}
             onPress={handleSimulateExternalConflict}
           >
+            <Zap size={14} color="#F59E0B" />
             <Text style={styles.simulateConflictText}>
-              ⚡ Simular Modificación Externa (Probar Conflicto 409)
+              Simular Modificación Externa (Probar Conflicto 409)
             </Text>
           </TouchableOpacity>
         </View>
@@ -290,7 +296,7 @@ export const TicketDetailScreen: React.FC = () => {
         <View style={styles.modalOverlay}>
           <View style={styles.conflictCard}>
             <View style={styles.conflictIconCircle}>
-              <Text style={styles.conflictIcon}>⚠️</Text>
+              <TriangleAlert size={28} color="#F59E0B" />
             </View>
 
             <Text style={styles.conflictTitle}>
@@ -309,7 +315,7 @@ export const TicketDetailScreen: React.FC = () => {
                   v{ticket.version}
                 </Text>
               </View>
-              <Text style={styles.arrowIcon}>→</Text>
+              <ArrowRight size={18} color="#64748B" />
               <View style={styles.versionBox}>
                 <Text style={styles.versionBoxLabel}>SERVIDOR</Text>
                 <Text style={[styles.versionBoxVal, { color: '#10B981' }]}>
@@ -324,7 +330,8 @@ export const TicketDetailScreen: React.FC = () => {
             </Text>
 
             <Button
-              title="🔄 Recargar Datos del Servidor"
+              title="Recargar Datos del Servidor"
+              icon={<RefreshCw size={15} color="#FFFFFF" />}
               onPress={() => {
                 setShowConflictModal(false);
                 fetchTicket();
@@ -353,6 +360,9 @@ const styles = StyleSheet.create({
     borderBottomColor: '#1E293B',
   },
   backButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 5,
     paddingVertical: 6,
     paddingHorizontal: 10,
     backgroundColor: '#1E293B',
@@ -502,6 +512,13 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     alignItems: 'center',
   },
+  attachmentNameRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+    flexShrink: 1,
+    marginRight: 8,
+  },
   attachmentName: {
     color: '#F8FAFC',
     fontSize: 12,
@@ -555,7 +572,10 @@ const styles = StyleSheet.create({
     borderColor: 'rgba(239, 68, 68, 0.3)',
     borderRadius: 8,
     paddingVertical: 10,
+    flexDirection: 'row',
     alignItems: 'center',
+    justifyContent: 'center',
+    gap: 6,
   },
   simulateConflictText: {
     color: '#F87171',
@@ -619,9 +639,6 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     marginBottom: 12,
   },
-  conflictIcon: {
-    fontSize: 24,
-  },
   conflictTitle: {
     color: '#EF4444',
     fontSize: 16,
@@ -663,11 +680,6 @@ const styles = StyleSheet.create({
     fontSize: 18,
     fontWeight: '700',
     fontFamily: 'monospace',
-  },
-  arrowIcon: {
-    color: '#64748B',
-    fontSize: 16,
-    fontWeight: '700',
   },
   conflictHint: {
     color: '#94A3B8',

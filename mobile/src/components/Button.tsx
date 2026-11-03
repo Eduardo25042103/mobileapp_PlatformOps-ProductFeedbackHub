@@ -2,6 +2,7 @@ import React from 'react';
 import {
   TouchableOpacity,
   Text,
+  View,
   ActivityIndicator,
   StyleSheet,
   ViewStyle,
@@ -14,6 +15,7 @@ interface ButtonProps {
   variant?: 'primary' | 'secondary' | 'outline' | 'danger';
   loading?: boolean;
   disabled?: boolean;
+  icon?: React.ReactNode;
   style?: ViewStyle;
   textStyle?: TextStyle;
 }
@@ -24,6 +26,7 @@ export const Button: React.FC<ButtonProps> = ({
   variant = 'primary',
   loading = false,
   disabled = false,
+  icon,
   style,
   textStyle,
 }) => {
@@ -48,17 +51,20 @@ export const Button: React.FC<ButtonProps> = ({
       {loading ? (
         <ActivityIndicator color={isOutline || isSecondary ? '#F8FAFC' : '#FFFFFF'} />
       ) : (
-        <Text
-          style={[
-            styles.text,
-            isSecondary && styles.secondaryText,
-            isOutline && styles.outlineText,
-            isDanger && styles.dangerText,
-            textStyle,
-          ]}
-        >
-          {title}
-        </Text>
+        <View style={styles.contentRow}>
+          {icon}
+          <Text
+            style={[
+              styles.text,
+              isSecondary && styles.secondaryText,
+              isOutline && styles.outlineText,
+              isDanger && styles.dangerText,
+              textStyle,
+            ]}
+          >
+            {title}
+          </Text>
+        </View>
       )}
     </TouchableOpacity>
   );
@@ -72,7 +78,12 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
     alignItems: 'center',
     justifyContent: 'center',
+  },
+  contentRow: {
     flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 8,
   },
   secondary: {
     backgroundColor: '#1E293B',

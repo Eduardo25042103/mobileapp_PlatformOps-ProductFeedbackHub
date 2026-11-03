@@ -1,5 +1,6 @@
 import React from 'react';
 import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
+import { Building2, User, Paperclip } from 'lucide-react-native';
 import { Ticket } from '../types/ticket';
 import { PriorityBadge } from './PriorityBadge';
 import { StatusBadge } from './StatusBadge';
@@ -38,22 +39,27 @@ export const TicketCard: React.FC<TicketCardProps> = ({ ticket, onPress }) => {
 
       {/* Client & Category Info */}
       <View style={styles.clientRow}>
+        <Building2 size={13} color="#94A3B8" />
         <Text style={styles.clientText}>
-          🏢 {ticket.clienteNombre}
+          {ticket.clienteNombre}
         </Text>
         <Text style={styles.planText}>({ticket.clientePlan})</Text>
       </View>
 
       {/* Footer Info: Author / Assignee, Attachments, Date */}
       <View style={styles.footerRow}>
-        <Text style={styles.assignedText}>
-          👤 {ticket.asignadoA ? `Dev: ${ticket.asignadoA}` : `Por: ${ticket.reportadoPor}`}
-        </Text>
+        <View style={styles.assignedContainer}>
+          <User size={12} color="#64748B" />
+          <Text style={styles.assignedText}>
+            {ticket.asignadoA ? `Dev: ${ticket.asignadoA}` : `Por: ${ticket.reportadoPor}`}
+          </Text>
+        </View>
 
         <View style={styles.footerRight}>
           {ticket.adjuntos.length > 0 && (
             <View style={styles.attachmentBadge}>
-              <Text style={styles.attachmentText}>📎 {ticket.adjuntos.length}</Text>
+              <Paperclip size={10} color="#94A3B8" />
+              <Text style={styles.attachmentText}>{ticket.adjuntos.length}</Text>
             </View>
           )}
           <Text style={styles.timeText}>{ticket.createdAt}</Text>
@@ -114,7 +120,7 @@ const styles = StyleSheet.create({
   clientRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 4,
+    gap: 6,
     marginBottom: 10,
   },
   clientText: {
@@ -135,6 +141,12 @@ const styles = StyleSheet.create({
     borderTopColor: 'rgba(51, 65, 85, 0.5)',
     paddingTop: 8,
   },
+  assignedContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 5,
+    flexShrink: 1,
+  },
   assignedText: {
     color: '#64748B',
     fontSize: 11,
@@ -145,6 +157,9 @@ const styles = StyleSheet.create({
     gap: 8,
   },
   attachmentBadge: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
     backgroundColor: 'rgba(255, 255, 255, 0.05)',
     paddingHorizontal: 6,
     paddingVertical: 2,

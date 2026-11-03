@@ -22,7 +22,7 @@ import { Department } from '../types/auth';
 import { useAuth } from '../context/AuthContext';
 import { InputText } from '../components/InputText';
 import { Button } from '../components/Button';
-import { Code, Headset, LucideIcon, Megaphone, TrendingUp } from 'lucide-react-native';
+import { ArrowLeft, Code, Headset, LucideIcon, Megaphone, TrendingUp } from 'lucide-react-native';
 
 const registerSchema = z.object({
   nombre: z.string().min(3, 'El nombre debe tener al menos 3 caracteres'),
@@ -92,6 +92,22 @@ export const RegisterScreen: React.FC = () => {
             showsVerticalScrollIndicator={false}
             keyboardShouldPersistTaps="handled"
           >
+            {/* Back to Login */}
+            <TouchableOpacity
+              style={styles.backButton}
+              onPress={() => {
+                if (navigation.canGoBack()) {
+                  navigation.goBack();
+                } else {
+                  navigation.navigate('Login');
+                }
+              }}
+              activeOpacity={0.7}
+            >
+              <ArrowLeft size={16} color="#818CF8" />
+              <Text style={styles.backButtonText}>Volver al login</Text>
+            </TouchableOpacity>
+
             {/* Header */}
             <View style={styles.header}>
               <Text style={styles.title}>Registro de Empleado</Text>
@@ -207,6 +223,24 @@ const styles = StyleSheet.create({
     padding: 24,
     paddingTop: 16,
     paddingBottom: 40,
+  },
+  backButton: {
+    alignSelf: 'flex-start',
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+    backgroundColor: '#1E293B',
+    paddingHorizontal: 12,
+    paddingVertical: 8,
+    borderRadius: 8,
+    borderWidth: 1,
+    borderColor: '#334155',
+    marginBottom: 16,
+  },
+  backButtonText: {
+    color: '#818CF8',
+    fontSize: 13,
+    fontWeight: '600',
   },
   header: {
     marginBottom: 20,

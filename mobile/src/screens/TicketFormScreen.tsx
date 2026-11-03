@@ -22,16 +22,29 @@ import { AppStackParamList } from '../types/navigation';
 import { TicketCategory, TicketPriority } from '../types/ticket';
 import { ticketsApi } from '../api/ticketsApi';
 import { Button } from '../components/Button';
+import {
+  ArrowLeft,
+  Building2,
+  Camera,
+  Database,
+  Lock,
+  LucideIcon,
+  Paperclip,
+  PenTool,
+  Printer,
+  Settings,
+  Zap,
+} from 'lucide-react-native';
 
 type TicketFormNavProp = NativeStackNavigationProp<AppStackParamList, 'TicketForm'>;
 
-const CATEGORIES: { id: TicketCategory; label: string }[] = [
-  { id: 'AUTENTICACION', label: '🔐 Autenticación' },
-  { id: 'FIRMA_ELECTRONICA', label: '✍️ Firma Electrónica' },
-  { id: 'BASE_DE_DATOS', label: '🗄️ Base de Datos' },
-  { id: 'API', label: '⚡ APIs & Webhooks' },
-  { id: 'IMPRESION', label: '🖨️ Impresión' },
-  { id: 'OTRO', label: '⚙️ Otros' },
+const CATEGORIES: { id: TicketCategory; label: string; icon: LucideIcon }[] = [
+  { id: 'AUTENTICACION', label: 'Autenticación', icon: Lock },
+  { id: 'FIRMA_ELECTRONICA', label: 'Firma Electrónica', icon: PenTool },
+  { id: 'BASE_DE_DATOS', label: 'Base de Datos', icon: Database },
+  { id: 'API', label: 'APIs & Webhooks', icon: Zap },
+  { id: 'IMPRESION', label: 'Impresión', icon: Printer },
+  { id: 'OTRO', label: 'Otros', icon: Settings },
 ];
 
 const PRIORITIES: { id: TicketPriority; label: string; color: string; desc: string }[] = [
@@ -172,7 +185,8 @@ export const TicketFormScreen: React.FC = () => {
             style={styles.backButton}
             onPress={() => navigation.goBack()}
           >
-            <Text style={styles.backButtonText}>← Cancelar</Text>
+            <ArrowLeft size={13} color="#818CF8" />
+            <Text style={styles.backButtonText}>Cancelar</Text>
           </TouchableOpacity>
           <Text style={styles.headerTitle}>Reportar Incidencia</Text>
           <View style={{ width: 60 }} />
@@ -229,12 +243,14 @@ export const TicketFormScreen: React.FC = () => {
               <View style={styles.chipsWrap}>
                 {CATEGORIES.map((c) => {
                   const isSelected = categoria === c.id;
+                  const IconComp = c.icon;
                   return (
                     <TouchableOpacity
                       key={c.id}
                       style={[styles.categoryChip, isSelected && styles.categoryChipSelected]}
                       onPress={() => setCategoria(c.id)}
                     >
+                      <IconComp size={12} color={isSelected ? '#818CF8' : '#94A3B8'} />
                       <Text style={[styles.categoryText, isSelected && styles.categoryTextSelected]}>
                         {c.label}
                       </Text>
@@ -256,9 +272,12 @@ export const TicketFormScreen: React.FC = () => {
                       style={[styles.clientCard, isSelected && styles.clientCardSelected]}
                       onPress={() => setClienteIndex(idx)}
                     >
-                      <Text style={[styles.clientName, isSelected && styles.clientNameSelected]}>
-                        🏢 {client.nombre}
-                      </Text>
+                      <View style={styles.clientNameRow}>
+                        <Building2 size={13} color={isSelected ? '#818CF8' : '#94A3B8'} />
+                        <Text style={[styles.clientName, isSelected && styles.clientNameSelected]}>
+                          {client.nombre}
+                        </Text>
+                      </View>
                       <Text style={styles.clientPlan}>{client.plan}</Text>
                     </TouchableOpacity>
                   );
@@ -288,9 +307,12 @@ export const TicketFormScreen: React.FC = () => {
                 <View style={styles.previewContainer}>
                   <Image source={{ uri: selectedImage.uri }} style={styles.previewImage} />
                   <View style={styles.previewMeta}>
-                    <Text style={styles.previewName} numberOfLines={1}>
-                      📎 {selectedImage.fileName || 'captura_error.jpg'}
-                    </Text>
+                    <View style={styles.previewNameRow}>
+                      <Paperclip size={13} color="#94A3B8" />
+                      <Text style={styles.previewName} numberOfLines={1}>
+                        {selectedImage.fileName || 'captura_error.jpg'}
+                      </Text>
+                    </View>
                     <Text style={styles.previewSub}>
                       {((selectedImage.fileSize || 180000) / 1024).toFixed(0)} KB • Listo para URL Prefirmada S3
                     </Text>
@@ -304,7 +326,9 @@ export const TicketFormScreen: React.FC = () => {
                 </View>
               ) : (
                 <TouchableOpacity style={styles.uploadBox} onPress={handlePickImage}>
-                  <Text style={styles.uploadIcon}>📷</Text>
+                  <View style={styles.uploadIconContainer}>
+                    <Camera size={26} color="#6366F1" />
+                  </View>
                   <Text style={styles.uploadTitle}>Adjuntar Captura desde la Galería</Text>
                   <Text style={styles.uploadSubtitle}>
                     Se subirá como binario directo a Amazon S3 (caducidad 5 min)
@@ -347,6 +371,9 @@ const styles = StyleSheet.create({
     borderBottomColor: '#1E293B',
   },
   backButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 5,
     paddingHorizontal: 10,
     paddingVertical: 6,
     borderRadius: 6,
@@ -426,6 +453,9 @@ const styles = StyleSheet.create({
     gap: 8,
   },
   categoryChip: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
     backgroundColor: '#1E293B',
     borderRadius: 6,
     borderWidth: 1,
@@ -463,6 +493,11 @@ const styles = StyleSheet.create({
     borderColor: '#6366F1',
     backgroundColor: 'rgba(99, 102, 241, 0.1)',
   },
+  clientNameRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 7,
+  },
   clientName: {
     color: '#CBD5E1',
     fontSize: 13,
@@ -487,9 +522,8 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
-  uploadIcon: {
-    fontSize: 28,
-    marginBottom: 6,
+  uploadIconContainer: {
+    marginBottom: 8,
   },
   uploadTitle: {
     color: '#F8FAFC',
@@ -520,6 +554,11 @@ const styles = StyleSheet.create({
   },
   previewMeta: {
     flex: 1,
+  },
+  previewNameRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
   },
   previewName: {
     color: '#F8FAFC',
