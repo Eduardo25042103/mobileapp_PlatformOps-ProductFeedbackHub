@@ -1,6 +1,6 @@
 import React from 'react';
 import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
-import { Building2, User, Paperclip } from 'lucide-react-native';
+import { Building2, User, Paperclip, Phone } from 'lucide-react-native';
 import { Ticket } from '../types/ticket';
 import { PriorityBadge } from './PriorityBadge';
 import { StatusBadge } from './StatusBadge';
@@ -44,6 +44,12 @@ export const TicketCard: React.FC<TicketCardProps> = ({ ticket, onPress }) => {
           {ticket.clienteNombre}
         </Text>
         <Text style={styles.planText}>({ticket.clientePlan})</Text>
+        {ticket.telefono ? (
+          <View style={styles.phoneChip}>
+            <Phone size={10} color="#64748B" />
+            <Text style={styles.phoneText}>{ticket.telefono}</Text>
+          </View>
+        ) : null}
       </View>
 
       {/* Footer Info: Author / Assignee, Attachments, Date */}
@@ -132,6 +138,23 @@ const styles = StyleSheet.create({
     color: '#06B6D4',
     fontSize: 11,
     fontWeight: '600',
+  },
+  phoneChip: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 3,
+    marginLeft: 'auto',
+    backgroundColor: '#0F172A',
+    paddingHorizontal: 6,
+    paddingVertical: 2,
+    borderRadius: 4,
+    borderWidth: 1,
+    borderColor: '#334155',
+  },
+  phoneText: {
+    color: '#64748B',
+    fontSize: 10,
+    fontFamily: 'monospace',
   },
   footerRow: {
     flexDirection: 'row',

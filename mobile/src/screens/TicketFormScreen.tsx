@@ -21,6 +21,7 @@ import * as ImagePicker from 'expo-image-picker';
 import { AppStackParamList } from '../types/navigation';
 import { TicketCategory, TicketPriority } from '../types/ticket';
 import { ticketsApi } from '../api/ticketsApi';
+import { useTickets } from '../context/TicketContext';
 import { Button } from '../components/Button';
 import {
   ArrowLeft,
@@ -31,6 +32,7 @@ import {
   LucideIcon,
   Paperclip,
   PenTool,
+  Phone,
   Printer,
   Settings,
   Zap,
@@ -63,8 +65,10 @@ const SAAS_CLIENTS = [
 
 export const TicketFormScreen: React.FC = () => {
   const navigation = useNavigation<TicketFormNavProp>();
+  const { createTicket } = useTickets();
 
   const [titulo, setTitulo] = useState('');
+  const [telefono, setTelefono] = useState('+51 987 654 321');
   const [categoria, setCategoria] = useState<TicketCategory>('AUTENTICACION');
   const [prioridad, setPrioridad] = useState<TicketPriority>('P1');
   const [clienteIndex, setClienteIndex] = useState(0);
@@ -106,6 +110,10 @@ export const TicketFormScreen: React.FC = () => {
       Alert.alert('Campo Obligatorio', 'Por favor ingresa un título para la incidencia.');
       return;
     }
+    if (!telefono.trim()) {
+      Alert.alert('Campo Obligatorio', 'Por favor ingresa un teléfono de contacto del cliente.');
+      return;
+    }
     if (!descripcion.trim()) {
       Alert.alert('Campo Obligatorio', 'Por favor describe el error y la traza encontrada.');
       return;
@@ -138,11 +146,12 @@ export const TicketFormScreen: React.FC = () => {
         setUploadingS3(false);
       }
 
-      // 3. Registra el ticket
+      // 3. Registra el ticket usando el contexto (useReducer)
       const selectedClient = SAAS_CLIENTS[clienteIndex];
-      const newTicket = await ticketsApi.createTicket({
+      const newTicket = await createTicket({
         titulo: titulo.trim(),
         descripcion: descripcion.trim(),
+        telefono: telefono.trim(),
         categoria,
         prioridad,
         clienteNombre: selectedClient.nombre,
@@ -285,6 +294,22 @@ export const TicketFormScreen: React.FC = () => {
               </View>
             </View>
 
+            {/* Teléfono de Contacto */}
+            <View style={styles.section}>
+              <View style={styles.labelRow}>
+                <Phone size={12} color="#94A3B8" />
+                <Text style={styles.label}>TELÉFONO DE CONTACTO</Text>
+              </View>
+              <TextInput
+                style={styles.textInput}
+                placeholder="Ej. +51 987 654 321"
+                placeholderTextColor="#64748B"
+                keyboardType="phone-pad"
+                value={telefono}
+                onChangeText={setTelefono}
+              />
+            </View>
+
             {/* Descripción Técnica */}
             <View style={styles.section}>
               <Text style={styles.label}>DESCRIPCIÓN Y TRAZABILIDAD DEL ERROR</Text>
@@ -404,6 +429,12 @@ const styles = StyleSheet.create({
     color: '#94A3B8',
     marginBottom: 8,
     letterSpacing: 0.5,
+  },
+  labelRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+    marginBottom: 8,
   },
   textInput: {
     backgroundColor: '#1E293B',

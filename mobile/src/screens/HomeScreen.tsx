@@ -13,6 +13,7 @@ import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { TriangleAlert } from 'lucide-react-native';
 import { AppStackParamList } from '../types/navigation';
 import { useAuth } from '../context/AuthContext';
+import { useTickets } from '../context/TicketContext';
 import { Button } from '../components/Button';
 
 type HomeNavProp = NativeStackNavigationProp<AppStackParamList, 'Home'>;
@@ -21,7 +22,11 @@ export const HomeScreen: React.FC = () => {
   const { user, logout } = useAuth();
   const navigation = useNavigation<HomeNavProp>();
   const [pulse] = useState(new Animated.Value(1));
-  const [kpiTickets, setKpiTickets] = useState(14);
+  const { tickets } = useTickets();
+  const totalOpenTickets = tickets.filter(
+    (t) => t.estado !== 'RESUELTO' && t.estado !== 'CERRADO'
+  ).length;
+  const p1CriticalTickets = tickets.filter((t) => t.prioridad === 'P1').length;
 
   useEffect(() => {
     Animated.loop(
@@ -108,13 +113,13 @@ export const HomeScreen: React.FC = () => {
         <View style={styles.kpiGrid}>
           <View style={styles.kpiCard}>
             <Text style={styles.kpiLabel}>TOTAL ABIERTOS</Text>
-            <Text style={styles.kpiNumber}>{kpiTickets}</Text>
+            <Text style={styles.kpiNumber}>{totalOpenTickets}</Text>
             <Text style={styles.kpiNote}>Actualizado vía SSE</Text>
           </View>
 
           <View style={[styles.kpiCard, styles.kpiCardP1]}>
             <Text style={[styles.kpiLabel, { color: '#EF4444' }]}>P1 CRÍTICOS</Text>
-            <Text style={[styles.kpiNumber, { color: '#EF4444' }]}>2</Text>
+            <Text style={[styles.kpiNumber, { color: '#EF4444' }]}>{p1CriticalTickets}</Text>
             <Text style={[styles.kpiNote, { color: 'rgba(239, 68, 68, 0.7)' }]}>
               Atención prioritaria
             </Text>

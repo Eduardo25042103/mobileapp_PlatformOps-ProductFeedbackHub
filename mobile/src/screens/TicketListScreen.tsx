@@ -26,7 +26,7 @@ import {
 } from 'lucide-react-native';
 import { AppStackParamList } from '../types/navigation';
 import { Ticket, TicketPriority, TicketStatus } from '../types/ticket';
-import { ticketsApi } from '../api/ticketsApi';
+import { useTickets } from '../context/TicketContext';
 import { TicketCard } from '../components/TicketCard';
 
 type TicketListNavigationProp = NativeStackNavigationProp<AppStackParamList, 'TicketList'>;
@@ -48,29 +48,15 @@ const FILTER_OPTIONS: FilterOption[] = [
 
 export const TicketListScreen: React.FC = () => {
   const navigation = useNavigation<TicketListNavigationProp>();
-  const [tickets, setTickets] = useState<Ticket[]>([]);
-  const [loading, setLoading] = useState(true);
+  const { tickets, loading, refreshTickets } = useTickets();
   const [refreshing, setRefreshing] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedFilter, setSelectedFilter] = useState<'ALL' | 'P1' | 'P2' | 'EN_DIAGNOSTICO' | 'RESUELTO'>('ALL');
 
-  const fetchTickets = async () => {
-    try {
-      const data = await ticketsApi.getTickets();
-      setTickets(data);
-    } finally {
-      setLoading(false);
-      setRefreshing(false);
-    }
-  };
-
-  useEffect(() => {
-    fetchTickets();
-  }, []);
-
-  const onRefresh = () => {
+  const onRefresh = async () => {
     setRefreshing(true);
-    fetchTickets();
+    await refreshTickets();
+    setRefreshing(false);
   };
 
   const filteredTickets = useMemo(() => {

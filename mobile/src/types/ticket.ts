@@ -41,6 +41,7 @@ export interface Ticket {
   logsError?: string;
   clienteNombre: string;
   clientePlan: string;
+  telefono: string;
   categoria: TicketCategory;
   prioridad: TicketPriority;
   estado: TicketStatus;
@@ -56,6 +57,7 @@ export interface Ticket {
 export interface UpdateTicketInput {
   estado?: TicketStatus;
   prioridad?: TicketPriority;
+  telefono?: string;
   version: number;
   nuevoComentario?: string;
 }
@@ -63,6 +65,7 @@ export interface UpdateTicketInput {
 export interface CreateTicketInput {
   titulo: string;
   descripcion: string;
+  telefono: string;
   categoria: TicketCategory;
   prioridad: TicketPriority;
   clienteNombre: string;

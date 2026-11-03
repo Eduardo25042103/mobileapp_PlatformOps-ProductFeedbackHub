@@ -14,10 +14,10 @@ import {
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRoute, useNavigation, RouteProp } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
-import { ArrowLeft, ArrowRight, Paperclip, RefreshCw, TriangleAlert, Zap } from 'lucide-react-native';
+import { ArrowLeft, ArrowRight, Paperclip, Phone, RefreshCw, Trash2, TriangleAlert, Zap } from 'lucide-react-native';
 import { AppStackParamList } from '../types/navigation';
 import { Ticket, TicketStatus } from '../types/ticket';
-import { ticketsApi } from '../api/ticketsApi';
+import { useTickets } from '../context/TicketContext';
 import { PriorityBadge } from '../components/PriorityBadge';
 import { StatusBadge } from '../components/StatusBadge';
 import { Button } from '../components/Button';
@@ -30,9 +30,18 @@ export const TicketDetailScreen: React.FC = () => {
   const navigation = useNavigation<TicketDetailNavProp>();
   const { ticketId } = route.params;
 
+  const {
+    getTicketById,
+    updateTicket,
+    deleteTicket,
+    simulateExternalConflict,
+    refreshTickets,
+  } = useTickets();
+
   const [ticket, setTicket] = useState<Ticket | null>(null);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
+  const [deleting, setDeleting] = useState(false);
   const [selectedStatus, setSelectedStatus] = useState<TicketStatus | null>(null);
   const [newComment, setNewComment] = useState('');
 
@@ -40,22 +49,19 @@ export const TicketDetailScreen: React.FC = () => {
   const [showConflictModal, setShowConflictModal] = useState(false);
   const [conflictServerVersion, setConflictServerVersion] = useState<number>(2);
 
-  const fetchTicket = async () => {
-    try {
-      setLoading(true);
-      const data = await ticketsApi.getTicketById(ticketId);
-      setTicket(data);
-      setSelectedStatus(data.estado);
-    } catch (e: any) {
-      Alert.alert('Error', e.message || 'No se pudo cargar el ticket');
-    } finally {
-      setLoading(false);
+  const fetchTicket = () => {
+    setLoading(true);
+    const found = getTicketById(ticketId);
+    if (found) {
+      setTicket(found);
+      setSelectedStatus(found.estado);
     }
+    setLoading(false);
   };
 
   useEffect(() => {
     fetchTicket();
-  }, [ticketId]);
+  }, [ticketId, getTicketById]);
 
   // Guardar cambios aplicando la validación de versión (Optimistic Locking)
   const handleSaveChanges = async () => {
@@ -63,9 +69,9 @@ export const TicketDetailScreen: React.FC = () => {
 
     setSaving(true);
     try {
-      const updated = await ticketsApi.updateTicket(ticket.id, {
+      const updated = await updateTicket(ticket.id, {
         estado: selectedStatus || ticket.estado,
-        version: ticket.version, // Enviamos la versión que el cliente conoce
+        version: ticket.version,
         nuevoComentario: newComment.trim() || undefined,
       });
 
@@ -87,10 +93,39 @@ export const TicketDetailScreen: React.FC = () => {
     }
   };
 
+  // Eliminar ticket con confirmación obligatoria mediante Alert
+  const handleDeleteTicket = () => {
+    if (!ticket) return;
+
+    Alert.alert(
+      'Eliminar Incidencia',
+      `¿Estás seguro de que deseas eliminar permanentemente el ticket ${ticket.codigo}? Esta acción no se puede deshacer.`,
+      [
+        { text: 'Cancelar', style: 'cancel' },
+        {
+          text: 'Eliminar Registro',
+          style: 'destructive',
+          onPress: async () => {
+            setDeleting(true);
+            try {
+              await deleteTicket(ticket.id);
+              Alert.alert('Incidencia Eliminada', `El ticket ${ticket.codigo} ha sido eliminado.`);
+              navigation.goBack();
+            } catch (err: any) {
+              Alert.alert('Error', err.message || 'No fue posible eliminar la incidencia.');
+            } finally {
+              setDeleting(false);
+            }
+          },
+        },
+      ]
+    );
+  };
+
   // Simulación para fines académicos: Otro usuario modifica el ticket remotamente
   const handleSimulateExternalConflict = async () => {
     if (!ticket) return;
-    const newServerVer = await ticketsApi.simulateExternalConcurrentModification(ticket.id);
+    const newServerVer = await simulateExternalConflict(ticket.id);
     Alert.alert(
       'Simulación Ejecutada',
       `Otro desarrollador acaba de guardar cambios en este ticket desde otro equipo.\n\n` +
@@ -150,6 +185,10 @@ export const TicketDetailScreen: React.FC = () => {
               <Text style={styles.metaValue}>
                 {ticket.clienteNombre} ({ticket.clientePlan})
               </Text>
+            </View>
+            <View style={styles.metaRow}>
+              <Text style={styles.metaLabel}>Teléfono Contacto:</Text>
+              <Text style={styles.metaValue}>{ticket.telefono}</Text>
             </View>
             <View style={styles.metaRow}>
               <Text style={styles.metaLabel}>Categoría:</Text>
@@ -253,6 +292,16 @@ export const TicketDetailScreen: React.FC = () => {
             style={{ marginTop: 12 }}
           />
 
+          {/* Delete Action (CRUD: Eliminar con Confirmación) */}
+          <Button
+            title="Eliminar Incidencia"
+            variant="danger"
+            icon={<Trash2 size={15} color="#EF4444" />}
+            onPress={handleDeleteTicket}
+            loading={deleting}
+            style={{ marginTop: 10 }}
+          />
+
           {/* Simulator Button for Evaluation Demo */}
           <TouchableOpacity
             style={styles.simulateConflictBtn}
@@ -332,8 +381,9 @@ export const TicketDetailScreen: React.FC = () => {
             <Button
               title="Recargar Datos del Servidor"
               icon={<RefreshCw size={15} color="#FFFFFF" />}
-              onPress={() => {
+              onPress={async () => {
                 setShowConflictModal(false);
+                await refreshTickets();
                 fetchTicket();
               }}
               style={{ width: '100%' }}

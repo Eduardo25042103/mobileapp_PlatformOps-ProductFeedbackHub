@@ -18,6 +18,7 @@ JwtVerificationException: The token signature could not be verified against the 
 Pod: auth-service-7f89d-x2m9q, Node: ip-10-0-4-182.ec2.internal`,
     clienteNombre: 'Acme Logistics SaaS',
     clientePlan: 'Plan Enterprise',
+    telefono: '+51 987 654 321',
     categoria: 'AUTENTICACION',
     prioridad: 'P1',
     estado: 'EN_DIAGNOSTICO',
@@ -64,6 +65,7 @@ Pod: auth-service-7f89d-x2m9q, Node: ip-10-0-4-182.ec2.internal`,
       'La consulta de consolidación excede el tiempo límite de ejecución de 30 segundos en bases de datos con más de 500,000 registros históricos.',
     clienteNombre: 'Fintech Solutions S.A.C.',
     clientePlan: 'Plan Pro',
+    telefono: '+51 912 345 678',
     categoria: 'BASE_DE_DATOS',
     prioridad: 'P2',
     estado: 'EN_DESARROLLO',
@@ -83,6 +85,7 @@ Pod: auth-service-7f89d-x2m9q, Node: ip-10-0-4-182.ec2.internal`,
       'Al sincronizar pedidos creados en dólares desde Zoho CRM mediante el webhook, el monto en soles no aplica el tipo de cambio oficial del día.',
     clienteNombre: 'Grupo Comercial Andino',
     clientePlan: 'Plan Enterprise',
+    telefono: '+51 945 678 123',
     categoria: 'API',
     prioridad: 'P3',
     estado: 'NUEVO',
@@ -101,6 +104,7 @@ Pod: auth-service-7f89d-x2m9q, Node: ip-10-0-4-182.ec2.internal`,
       'El margen derecho se corta en impresoras de 58mm cuando la descripción del producto supera los 30 caracteres.',
     clienteNombre: 'Retail Fast Express',
     clientePlan: 'Plan Básico',
+    telefono: '+51 998 765 432',
     categoria: 'IMPRESION',
     prioridad: 'P4',
     estado: 'RESUELTO',
@@ -269,6 +273,7 @@ export const ticketsApi = {
         descripcion: input.descripcion,
         clienteNombre: input.clienteNombre,
         clientePlan: input.clientePlan,
+        telefono: input.telefono,
         categoria: input.categoria,
         prioridad: input.prioridad,
         estado: 'NUEVO',
@@ -293,6 +298,20 @@ export const ticketsApi = {
       // Se agrega al principio de la lista de tickets
       mockTickets = [newTicket, ...mockTickets];
       return newTicket;
+    }
+  },
+
+  /**
+   * Elimina una incidencia técnica del sistema (CRUD - Delete)
+   */
+  async deleteTicket(id: string): Promise<boolean> {
+    try {
+      await apiClient.delete(`/tickets/${id}`);
+      mockTickets = mockTickets.filter((t) => t.id !== id);
+      return true;
+    } catch {
+      mockTickets = mockTickets.filter((t) => t.id !== id);
+      return true;
     }
   },
 
