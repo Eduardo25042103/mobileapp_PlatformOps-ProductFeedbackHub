@@ -2,6 +2,9 @@
 
 Aplicación móvil empresarial desarrollada en **React Native** con **TypeScript** y **Expo (SDK 58)** para la gestión centralizada de incidencias técnicas, órdenes de atención y seguimiento de telemetría operativa entre las áreas de Soporte, TI/Desarrollo, Ventas y Marketing en empresas de software como servicio (SaaS).
 
+> 📍 **Índice y Mapa General del Repositorio:**  
+> Para consultar la ubicación y descripción de todas las especificaciones de arquitectura, el backend en .NET 10, la base de datos MySQL 8.4, los informes académicos y los guiones de sustentación, revisa el [**`MAPA_DEL_PROYECTO.md`**](MAPA_DEL_PROYECTO.md).
+
 ---
 
 ## 👥 Integrantes del Grupo (4 Integrantes)

@@ -1,0 +1,314 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head><meta charset="utf-8"/><meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" name="viewport"/><meta content="mobile_stack" name="shell-type"/><link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet"/><link href="https://fonts.googleapis.com" rel="preconnect"/><link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/><link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&amp;family=Inter:wght@400;500;600&amp;family=JetBrains+Mono:wght@400;500;600&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/><style>@layer base{html,body{width:100vw;margin:0;padding:0;background-color:#0b1326;color:#dae2fd;}body{overscroll-behavior:none;}.pb-safe{padding-bottom:env(safe-area-inset-bottom,0px);}.pt-safe{padding-top:env(safe-area-inset-top,0px);}main>:first-child{margin-top:0!important;}main>:last-child{margin-bottom:0!important;}}::-webkit-scrollbar{display:none;}</style><script src="https://cdn.tailwindcss.com"></script><script id="tailwind-config">tailwind.config={darkMode:"class",theme:{extend:{colors:{"on-background":"#dae2fd","inverse-primary":"#494bd6","surface-container-lowest":"#060e20","surface-bright":"#31394d","tertiary-container":"#009eb9","tertiary":"#4cd7f6","secondary-container":"#571bc1","on-secondary-container":"#c4abff","secondary":"#d0bcff","secondary-fixed":"#e9ddff","on-secondary-fixed":"#23005c","on-primary-container":"#0d0096","surface-container-highest":"#2d3449","surface-container-high":"#222a3d","on-error":"#690005","background":"#0b1326","inverse-surface":"#dae2fd","on-surface":"#dae2fd","primary-fixed":"#e1e0ff","surface-tint":"#c0c1ff","primary":"#c0c1ff","on-surface-variant":"#c7c4d7","error":"#ffb4ab","surface":"#0b1326","outline-variant":"#464554","primary-container":"#8083ff","primary-fixed-dim":"#c0c1ff","inverse-on-surface":"#283044","surface-container":"#171f33","on-tertiary-fixed-variant":"#004e5c","outline":"#908fa0","secondary-fixed-dim":"#d0bcff","on-tertiary":"#003640","error-container":"#93000a","on-primary-fixed":"#07006c","tertiary-fixed-dim":"#4cd7f6","surface-dim":"#0b1326","on-secondary-fixed-variant":"#5516be","tertiary-fixed":"#acedff","surface-container-low":"#131b2e","on-error-container":"#ffdad6","on-primary":"#1000a9","on-tertiary-fixed":"#001f26","on-primary-fixed-variant":"#2f2ebe","on-secondary":"#3c0091","surface-variant":"#2d3449","on-tertiary-container":"#002f38"},borderRadius:{DEFAULT:"0.125rem",lg:"0.25rem",xl:"0.5rem",full:"0.75rem"},spacing:{"space-xs":"0.25rem","gutter-desktop":"1rem","space-xl":"1.5rem","margin-desktop":"1.5rem","space-lg":"1rem",gutter:"0.75rem",margin:"1rem","space-md":"0.75rem","space-sm":"0.5rem"},fontFamily:{"headline-lg-mobile":["Geist"],"body-md":["Inter"],"label-xs":["JetBrains Mono"],"label-md":["JetBrains Mono"],"headline-sm":["Geist"],"headline-lg":["Geist"],"headline-md":["Geist"],"label-sm":["JetBrains Mono"],"body-sm":["Inter"],"body-lg":["Inter"]},fontSize:{"headline-lg-mobile":["24px",{lineHeight:"32px",letterSpacing:"-0.02em",fontWeight:"600"}],"body-md":["14px",{lineHeight:"20px",letterSpacing:"0em",fontWeight:"400"}],"label-xs":["10px",{lineHeight:"12px",letterSpacing:"0.05em",fontWeight:"600"}],"label-md":["12px",{lineHeight:"16px",letterSpacing:"-0.01em",fontWeight:"500"}],"headline-sm":["16px",{lineHeight:"24px",letterSpacing:"-0.01em",fontWeight:"600"}],"headline-lg":["30px",{lineHeight:"38px",letterSpacing:"-0.025em",fontWeight:"600"}],"headline-md":["20px",{lineHeight:"28px",letterSpacing:"-0.015em",fontWeight:"600"}],"label-sm":["11px",{lineHeight:"14px",letterSpacing:"0.02em",fontWeight:"500"}],"body-sm":["12px",{lineHeight:"16px",letterSpacing:"0em",fontWeight:"400"}],"body-lg":["16px",{lineHeight:"24px",letterSpacing:"-0.005em",fontWeight:"400"}]}}}}</script><style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head><body class="bg-surface font-body-md text-on-surface antialiased"><header class="fixed top-0 w-full z-50 bg-surface-container-lowest/80 backdrop-blur-xl shadow-[0_1px_8px_rgba(0,0,0,0.4)] pt-safe"><div class="h-16 px-margin flex items-center justify-between gap-space-sm"><div class="flex items-center gap-space-sm min-w-0"><button class="flex items-center justify-center min-w-[44px] min-h-[44px] -ml-2 text-on-surface hover:text-primary transition-colors" onclick="history.back()"><span class="material-symbols-outlined text-[20px]">arrow_back</span></button><img alt="Platform Ops Hub Logo" class="h-7 w-auto object-contain shrink-0" src="https://lh3.googleusercontent.com/aida/AEtjO1XzfruruTBUz3_1BFfOWaGkguEo6mRVFoHW7BRAXfwUVFbho38wks3Ppet8Z470CRB5MKMyFICK3omG_ApXm_HIsmD7T4S2x2QqoUG6XWIch5wK6BLOdkWB2XTTjp89XmRDM9R6ipeKRw5SDTiu4XxMOD0fzGJkgFxWRNv3HRNQwnC3mMSd90Xog3ZdrcA9SRIdKMbyDCTuQFMP0xXbfXjYPRKYXNR75gA6MQtiXT3rLdl-Gl0Z-hZb-Q"/><h1 class="font-headline-sm text-headline-sm text-on-surface tracking-tight truncate">Detalle Incidencia</h1></div><div class="flex items-center gap-space-sm shrink-0"><img alt="Profile" class="w-8 h-8 rounded-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAlVZ2f34kLOzPijeOG7w-Qn34PTVLiUtSKfkH-fAyEtj79k_U_65SsoTVAI8CRy-QBOVori5FqNx6WXXNXKGRB-MZD0x7LBeOm_L3F_f3G9hlZ_b3Hbe2nKSGF-FeibaTO_7UO-25g4iTgvsDGqvHUubhnEfHRZtn-TPUvH5GHE56N9o9wjsAu-ARhdrC5o8og7lYv5Pb4-omkza4HyJ2pEaTPObl96L6H68RBVY-3XbGKHbT0ps0"/></div></div></header><main class="flex flex-col relative w-full pt-16 pb-safe bg-surface min-h-screen"><div class="flex flex-col w-full text-on-surface">
+<div class="px-margin pt-space-md pb-space-xs flex items-center justify-between gap-space-sm bg-surface-container-lowest/60 backdrop-blur-sm">
+<div class="flex items-center gap-space-sm min-w-0">
+<span class="font-label-md text-label-md text-tertiary bg-surface-container-high px-2 py-0.5 rounded-full font-mono">#TK-1082</span>
+<span class="font-headline-sm text-headline-sm text-on-surface truncate">Detalle de Incidencia</span>
+</div>
+<div class="flex items-center gap-space-xs bg-surface-container px-2.5 py-1 rounded-full shadow-sm">
+<span class="material-symbols-outlined text-primary text-[14px]">lock</span>
+<span class="font-label-xs text-label-xs font-mono text-on-surface-variant uppercase tracking-wider">Versión: <span class="text-primary font-bold">v1</span></span>
+</div>
+</div>
+<div class="mx-margin mt-space-md rounded-xl bg-error-container text-on-error-container p-space-md shadow-xl transition-all duration-300" id="conflictBanner">
+<div class="flex items-start gap-space-sm">
+<div class="p-1.5 bg-on-error-container/10 rounded-lg shrink-0 mt-0.5">
+<span class="material-symbols-outlined text-error text-[22px] leading-none">warning</span>
+</div>
+<div class="flex flex-col flex-1 min-w-0">
+<div class="flex items-center justify-between">
+<h2 class="font-headline-sm text-headline-sm text-error font-semibold flex items-center gap-1.5">
+            ¡Conflicto de Concurrencia!
+            <span class="font-label-xs text-label-xs bg-error text-on-error px-1.5 py-0.5 rounded-full uppercase">HTTP 409</span>
+</h2>
+</div>
+<p class="font-body-sm text-body-sm text-on-error-container/90 mt-1 leading-relaxed">
+          Otro usuario (<strong class="text-error font-medium">Carlos Mendoza — TI</strong>) modificó y guardó este ticket mientras lo editabas. La versión en el servidor ahora es <span class="font-mono bg-on-error-container/10 px-1 py-0.5 rounded text-error font-bold">v2</span> (tu versión local es <span class="font-mono line-through opacity-75">v1</span>). Tus modificaciones locales han sido congeladas para proteger la consistencia de datos.
+        </p>
+<div class="flex flex-wrap items-center gap-space-sm mt-3 pt-2">
+<button class="flex items-center gap-1.5 bg-error text-on-error px-3 py-1.5 rounded-lg font-body-sm text-body-sm font-medium shadow-md active:scale-95 transition-transform" id="reloadBtn">
+<span class="material-symbols-outlined text-[16px]">sync</span>
+            Recargar servidor (v2)
+          </button>
+<button class="flex items-center gap-1.5 bg-surface-container-highest/60 hover:bg-surface-container-highest text-on-surface px-3 py-1.5 rounded-lg font-body-sm text-body-sm font-medium transition-colors" id="compareBtn">
+<span class="material-symbols-outlined text-[16px]">difference</span>
+            Comparar diferencias
+          </button>
+</div>
+</div>
+</div>
+</div>
+<div class="hidden mx-margin mt-space-sm p-space-md rounded-xl bg-surface-container-low shadow-sm" id="diffView">
+<div class="flex items-center justify-between mb-2">
+<span class="font-label-sm text-label-sm uppercase font-mono text-primary flex items-center gap-1">
+<span class="material-symbols-outlined text-[14px]">tune</span> Diff Inspector [v1 ↔ v2]
+      </span>
+<button class="text-on-surface-variant hover:text-on-surface" onclick="document.getElementById('diffView').classList.add('hidden')">
+<span class="material-symbols-outlined text-[18px]">close</span>
+</button>
+</div>
+<div class="space-y-1.5 font-label-xs text-label-xs font-mono">
+<div class="p-2 rounded bg-error-container/20 text-error flex items-start gap-2">
+<span>- v1 (Local):</span>
+<span class="flex-1">Estado: "En Diagnóstico" | Nota: "Esperando trace..."</span>
+</div>
+<div class="p-2 rounded bg-tertiary-container/20 text-tertiary flex items-start gap-2">
+<span>+ v2 (Servidor):</span>
+<span class="flex-1">Estado: "En Desarrollo" | Nota: "Parche NTP aplicado por Carlos Mendoza"</span>
+</div>
+</div>
+</div>
+<div class="px-margin mt-space-md flex flex-col gap-space-sm">
+<div class="flex items-center gap-space-xs flex-wrap">
+<span class="inline-flex items-center gap-1 bg-error/15 text-error px-2.5 py-0.5 rounded-full font-label-xs text-label-xs font-mono uppercase">
+<span class="material-symbols-outlined text-[12px]">emergency</span>
+        P1 Crítico
+      </span>
+<span class="relative inline-flex items-center gap-1.5 bg-tertiary-container/30 text-tertiary px-2.5 py-0.5 rounded-full font-label-xs text-label-xs font-mono uppercase">
+<span class="h-1.5 w-1.5 rounded-full bg-tertiary animate-ping"></span>
+        En Diagnóstico
+      </span>
+<span class="bg-surface-container text-on-surface-variant px-2.5 py-0.5 rounded-full font-label-xs text-label-xs font-mono">
+        TI / Desarrollo
+      </span>
+<span class="bg-secondary-container/40 text-on-secondary-container px-2.5 py-0.5 rounded-full font-label-xs text-label-xs font-mono">
+        Acme Corp (Enterprise)
+      </span>
+</div>
+<h2 class="font-headline-lg-mobile text-headline-lg-mobile text-on-surface font-semibold tracking-tight leading-snug">
+      Fallo en validación de token JWT al emitir facturas automáticas
+    </h2>
+<div class="flex items-center gap-space-sm text-on-surface-variant font-body-sm text-body-sm">
+<div class="w-6 h-6 rounded-full bg-primary-container text-on-primary-container flex items-center justify-center font-label-xs font-bold">
+        LM
+      </div>
+<span class="flex items-center gap-1">
+        Reportado por <strong class="text-on-surface font-medium">Lucía Morales</strong> (Soporte N2)
+      </span>
+<span class="text-outline text-[10px]">•</span>
+<span class="font-mono text-label-xs">hace 28m</span>
+</div>
+</div>
+<div class="px-margin mt-space-md">
+<div class="flex items-center justify-between mb-1.5 px-0.5">
+<div class="flex items-center gap-1.5">
+<span class="material-symbols-outlined text-tertiary text-[16px]">terminal</span>
+<span class="font-label-sm text-label-sm font-mono uppercase tracking-wider text-on-surface-variant">Trace Operativo de Excepción</span>
+</div>
+<button class="text-primary hover:text-primary-fixed font-label-xs text-label-xs font-mono flex items-center gap-0.5">
+<span class="material-symbols-outlined text-[13px]">content_copy</span> COPIAR
+      </button>
+</div>
+<div class="bg-surface-container-lowest p-space-md rounded-xl font-mono text-label-sm overflow-x-auto shadow-inner leading-relaxed">
+<div class="text-error font-semibold flex items-center gap-1.5">
+<span class="text-error-container">●</span> [ERROR 2025-05-18 10:14:22 UTC]
+      </div>
+<div class="text-on-surface mt-1 pl-3">
+<span class="text-tertiary">JWTValidationError</span>: Signature verification failed
+      </div>
+<div class="text-on-surface-variant pl-6 text-label-xs">
+        at AuthMiddleware.verifyToken (<span class="text-primary underline">auth.ts:89</span>)
+      </div>
+<div class="text-error/90 pl-6 text-label-xs">
+        ↳ Payload expired at <span class="font-bold">10:13:50 UTC</span> (Clock skew delta: +32s)
+      </div>
+</div>
+</div>
+<div class="px-margin mt-space-md">
+<div class="flex items-center justify-between mb-1.5 px-0.5">
+<span class="font-label-sm text-label-sm font-mono uppercase tracking-wider text-on-surface-variant flex items-center gap-1.5">
+<span class="material-symbols-outlined text-[16px]">cloud_sync</span> Telemetría y Evidencia S3
+      </span>
+<span class="inline-flex items-center gap-1 bg-surface-container-high px-2 py-0.5 rounded-full text-label-xs font-mono text-tertiary">
+<span class="material-symbols-outlined text-[12px]">verified</span> Verificado en S3
+      </span>
+</div>
+<div class="bg-surface-container-low rounded-xl p-space-sm flex flex-col gap-space-sm shadow-sm">
+<div class="relative w-full h-44 rounded-lg overflow-hidden bg-surface-container-lowest group cursor-pointer" onclick="toggleModal(true)">
+<img class="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105 opacity-85 hover:opacity-100" data-alt="Technical high-resolution screenshot preview of an API monitoring log inspector in a deep blue dark theme showing cryptographic signature failures, HTTP response payloads, and network headers with glowing cyber-indigo traces in Datadog style." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCvD1CeGnejfuXobjwS3cv4IOj9hxtYO9C6pSjMYru92j-vlHCEe7_6WD9BEdA6VrMlYG1Tt2nZcUw6TknpoMarvBrCE6uPIW8EetUmwZlGZaWpMWxaCSidXKiDbRE0ONpDGlMeZ9TIuEW7yGlvnz9vtz277aDWe1OpgQlXqwo6Yruz9aAXKJbg9nGpsc1GSfDftGYBMdraCzP34WiKuod2rpbPkr8j5sZmewljxmTHC3dAU_P1FqI"/>
+<div class="absolute inset-0 bg-gradient-to-t from-surface-container-lowest via-transparent to-transparent"></div>
+<div class="absolute bottom-2 left-2 right-2 flex items-center justify-between">
+<span class="font-mono text-label-xs text-on-surface/80 bg-surface-container-lowest/80 px-2 py-1 rounded backdrop-blur-sm truncate max-w-[210px]">
+            s3://platform-ops-logs/tk-1082-jwt-err.png
+          </span>
+<span class="bg-primary text-on-primary text-label-xs font-medium px-2 py-1 rounded-md flex items-center gap-1 shadow-md">
+<span class="material-symbols-outlined text-[12px]">fullscreen</span> Expandir
+          </span>
+</div>
+</div>
+<div class="flex items-center justify-between px-1 text-on-surface-variant font-label-xs font-mono">
+<span>Tamaño: 412 KB (PNG lossless)</span>
+<span>Región: us-east-1 (Encrypted KMS)</span>
+</div>
+</div>
+</div>
+<div class="px-margin mt-space-md">
+<label class="font-label-sm text-label-sm font-mono uppercase tracking-wider text-on-surface-variant mb-2 block px-0.5">
+      Estado Operativo del Ciclo de Vida
+    </label>
+<div class="grid grid-cols-3 sm:grid-cols-5 gap-1.5 p-1 bg-surface-container-lowest rounded-xl shadow-inner font-mono text-label-xs">
+<button class="py-2 px-1 text-center rounded-lg text-on-surface-variant hover:text-on-surface hover:bg-surface-container transition-all">
+        Nuevo
+      </button>
+<button class="py-2 px-1 text-center rounded-lg bg-primary-container text-on-primary-container font-semibold shadow-sm flex items-center justify-center gap-1">
+<span class="w-1.5 h-1.5 rounded-full bg-on-primary-container"></span>
+        Diagnóstico
+      </button>
+<button class="py-2 px-1 text-center rounded-lg text-on-surface-variant hover:text-on-surface hover:bg-surface-container transition-all">
+        Desarrollo
+      </button>
+<button class="py-2 px-1 text-center rounded-lg text-on-surface-variant hover:text-on-surface hover:bg-surface-container transition-all">
+        QA
+      </button>
+<button class="py-2 px-1 text-center rounded-lg text-on-surface-variant hover:text-on-surface hover:bg-surface-container transition-all col-span-2 sm:col-span-1">
+        Resuelto
+      </button>
+</div>
+</div>
+<div class="px-margin mt-space-md mb-28">
+<div class="flex items-center justify-between mb-3 px-0.5">
+<div class="flex items-center gap-1.5">
+<span class="material-symbols-outlined text-secondary text-[18px]">forum</span>
+<h3 class="font-headline-sm text-headline-sm text-on-surface">Canal de Coordinación</h3>
+</div>
+<span class="font-mono text-label-xs text-on-surface-variant bg-surface-container px-2 py-0.5 rounded-full">2 mensajes sincronizados</span>
+</div>
+<div class="flex flex-col gap-space-sm">
+<div class="flex gap-space-sm bg-surface-container-low p-space-md rounded-xl shadow-sm">
+<img class="w-9 h-9 rounded-full object-cover shrink-0 mt-0.5 ring-2 ring-surface-container-high" data-alt="Avatar portrait of Lucia Morales, female support specialist with glasses looking attentive in a professional engineering tech workspace with moody indigo workstation lights." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCtXmFg00F6sukCZ_wqkmI-gBQvL6XgzGMYYgsFGPUc84sgXA95-hqkmjGVofxvh2Ov9zzA5gOGJUQ48ApsbUqrS0Wxi5wWPtPnL5KvZrjtu0vbcG-DwEI6RsZTER0OtsDgw8aOvcTGkWQQjrIO5yufx-t06pFRvjUTMJ7VnxImPFB0b5S-iv6O9ksFGFiNIh7a2MO42x60NHi7MUmZO-BGhyP2yXg88ICHmUILUNRd-tEDAV1lA6w"/>
+<div class="flex flex-col flex-1 min-w-0">
+<div class="flex items-center justify-between gap-space-xs">
+<div class="flex items-center gap-1.5 min-w-0">
+<span class="font-headline-sm text-headline-sm text-on-surface font-semibold truncate">Lucía Morales</span>
+<span class="text-label-xs font-mono bg-surface-container-high text-on-surface-variant px-1.5 py-0.2 rounded">Soporte N2</span>
+</div>
+<span class="font-label-xs font-mono text-outline shrink-0">hace 25m</span>
+</div>
+<p class="font-body-md text-body-md text-on-surface-variant mt-1.5 leading-relaxed">
+            El cliente reportó que 14 usuarios corporativos quedaron completamente bloqueados al intentar emitir facturación masiva de cierre mensual.
+          </p>
+</div>
+</div>
+<div class="flex gap-space-sm bg-surface-container p-space-md rounded-xl shadow-sm">
+<img class="w-9 h-9 rounded-full object-cover shrink-0 mt-0.5 ring-2 ring-tertiary/40" data-alt="Avatar portrait of Elena Vega, female senior platform engineer with headphones concentrating in front of multiple dark IDE terminal displays with turquoise highlights." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCWFDj-GEMcnALSxQ9XaP-2WrSbkC1YxuuWsrHHa4h2GBEbYGjfsgVUxbkwwkey8Z9zGa1ZiNlFpEUDDbKP3_nkMFgFfpeVNiC9_5wv9dfsrOqKAa6lbIM7C93vsKGCdnFjWY2_FMi0cq929tNTXCrfFtslGHCIjUZ1fAmUk0kB0swyWotbv7LxzC2nTqBaEUwXnX3pRHAs2ha5RJjd4VjCZXP6fS56n01Z8yhEesJkG1X8KPRoFL0"/>
+<div class="flex flex-col flex-1 min-w-0">
+<div class="flex items-center justify-between gap-space-xs">
+<div class="flex items-center gap-1.5 min-w-0">
+<span class="font-headline-sm text-headline-sm text-tertiary font-semibold truncate">Elena Vega</span>
+<span class="text-label-xs font-mono bg-tertiary-container/40 text-tertiary px-1.5 py-0.2 rounded">TI Infra</span>
+</div>
+<span class="font-label-xs font-mono text-outline shrink-0">hace 10m</span>
+</div>
+<p class="font-body-md text-body-md text-on-surface mt-1.5 leading-relaxed">
+            Reproducido localmente. El daemon NTP del nodo auth-worker-04 tiene un desfase acumulado de 32 segundos. Los tokens emitidos son rechazados inmediatamente por desincronización horaria.
+          </p>
+</div>
+</div>
+</div>
+</div>
+<div class="fixed bottom-0 left-0 right-0 p-space-md bg-surface-container-lowest/90 backdrop-blur-xl shadow-2xl flex flex-col gap-2 z-40">
+<div class="flex items-center gap-2">
+<div class="relative flex-1">
+<input class="w-full bg-surface-container-high text-on-surface-variant font-body-sm text-body-sm rounded-lg px-3 py-2.5 opacity-60 cursor-not-allowed outline-none font-mono" disabled="" id="commentInput" type="text" value="[Bloqueado por HTTP 409: Recarga requerida para habilitar edición]"/>
+<span class="absolute right-3 top-2.5 material-symbols-outlined text-error text-[18px]">lock_clock</span>
+</div>
+<button class="bg-surface-container-highest text-on-surface-variant/40 font-body-md text-body-md px-4 py-2.5 rounded-lg font-medium flex items-center gap-1.5 cursor-not-allowed shadow-none shrink-0" disabled="" id="saveChangesBtn">
+<span class="material-symbols-outlined text-[18px]">save</span>
+        Guardar (v1)
+      </button>
+</div>
+<div class="flex items-center justify-between text-label-xs font-mono px-1">
+<span class="text-error flex items-center gap-1">
+<span class="w-1.5 h-1.5 rounded-full bg-error animate-pulse"></span>
+        Escritura deshabilitada (Optimistic Locking)
+      </span>
+<span class="text-on-surface-variant">ETag: "8f4a-9b12-v1"</span>
+</div>
+</div>
+<div class="hidden fixed inset-0 z-50 bg-surface-container-lowest/95 backdrop-blur-md flex flex-col p-4 justify-between" id="imageModal">
+<div class="flex items-center justify-between text-on-surface">
+<div class="flex items-center gap-2 font-mono text-label-sm">
+<span class="material-symbols-outlined text-tertiary text-[20px]">image</span>
+<span>tk-1082-jwt-err.png</span>
+</div>
+<button class="p-2 text-on-surface-variant hover:text-on-surface bg-surface-container rounded-full" onclick="toggleModal(false)">
+<span class="material-symbols-outlined text-[20px]">close</span>
+</button>
+</div>
+<div class="flex-1 flex items-center justify-center p-2">
+<img class="max-h-[663px] w-auto max-w-full rounded-xl object-contain shadow-2xl" data-alt="Full screen technical debug telemetry inspection display with detailed stack traces, HTTP request headers, and microservice mesh architecture mapping during high traffic load." src="https://lh3.googleusercontent.com/aida-public/AB6AXuAzKgDLKPxGXme0WraF6XLFdlUaQr00wOmRpZuYtHKM-6EEq5eu1_sA3_au1Mbq8tyzeQMTP8N6otdbNkufGRkk7FiVzK3Nb1Vv986rgKDUR4ruzHD9erDx-dLijPL7W_wZlZAoA1lg6TpkbMtnme-hZeP-sfhdRLuLAazzTzE9im0gRk6U13cZFX-MUeDGKvfV51y_cSNJwEtUkOs3VQHOToKd0SZ0kUOQNja41Twev2Wx8lPmquI"/>
+</div>
+<div class="flex items-center justify-between p-2 bg-surface-container rounded-xl text-label-xs font-mono">
+<span class="text-tertiary">URI: s3://platform-ops-logs/tk-1082-jwt-err.png</span>
+<button class="bg-primary text-on-primary px-3 py-1.5 rounded-md font-sans font-medium text-body-sm" onclick="toggleModal(false)">Cerrar Visor</button>
+</div>
+</div>
+</div>
+<script>
+  function toggleModal(open) {
+    const modal = document.getElementById('imageModal');
+    if (open) {
+      modal.classList.remove('hidden');
+    } else {
+      modal.classList.add('hidden');
+    }
+  }
+
+  const compareBtn = document.getElementById('compareBtn');
+  const diffView = document.getElementById('diffView');
+  if (compareBtn && diffView) {
+    compareBtn.addEventListener('click', () => {
+      diffView.classList.toggle('hidden');
+    });
+  }
+
+  const reloadBtn = document.getElementById('reloadBtn');
+  if (reloadBtn) {
+    reloadBtn.addEventListener('click', () => {
+      const banner = document.getElementById('conflictBanner');
+      const input = document.getElementById('commentInput');
+      const saveBtn = document.getElementById('saveChangesBtn');
+      
+      banner.innerHTML = `
+        <div class="flex items-center gap-2 text-tertiary">
+          <span class="material-symbols-outlined text-[20px] animate-spin">refresh</span>
+          <span class="font-mono text-label-md">Sincronizando estado con v2 del servidor...</span>
+        </div>
+      `;
+
+      setTimeout(() => {
+        banner.className = 'mx-margin mt-space-md rounded-xl bg-tertiary-container/30 text-tertiary p-space-sm shadow-md transition-all flex items-center justify-between';
+        banner.innerHTML = `
+          <div class="flex items-center gap-2">
+            <span class="material-symbols-outlined text-[18px]">check_circle</span>
+            <span class="font-body-sm text-body-sm font-medium">Sincronizado con versión v2 (servidor). Edición reanudada.</span>
+          </div>
+          <button onclick="this.parentElement.remove()" class="text-tertiary p-1">
+            <span class="material-symbols-outlined text-[16px]">close</span>
+          </button>
+        `;
+        
+        input.disabled = false;
+        input.value = '';
+        input.placeholder = 'Escribe una actualización o resolución técnica...';
+        input.classList.remove('opacity-60', 'cursor-not-allowed', 'text-on-surface-variant');
+        input.classList.add('text-on-surface');
+
+        saveBtn.disabled = false;
+        saveBtn.classList.remove('bg-surface-container-highest', 'text-on-surface-variant/40', 'cursor-not-allowed');
+        saveBtn.classList.add('bg-primary', 'text-on-primary', 'active:scale-95');
+        saveBtn.innerHTML = `
+          <span class="material-symbols-outlined text-[18px]">cloud_upload</span>
+          Guardar (v2)
+        `;
+      }, 700);
+    });
+  }
+</script></main></body></html>

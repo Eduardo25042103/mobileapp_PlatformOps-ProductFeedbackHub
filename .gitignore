@@ -15,18 +15,10 @@ web-build/
 .env
 .env*.local
 
-# Documentación interna de desarrollo y guías
-ESPECIFICACION_ARQUITECTURA.md
-ESPECIFICACION_SISTEMA_OPS_HUB.md
-GUIA_POC_MOVIL.md
-DESIGN.md
-stitch_designs/
-**/AGENTS.md
-**/.claude/
-.stitch-mcp/
-
-# macOS y Windows
+# Archivos de sistema y logs
 .DS_Store
 Thumbs.db
 *.log
 .system_generated/
+**/.claude/
+**/AGENTS.md
