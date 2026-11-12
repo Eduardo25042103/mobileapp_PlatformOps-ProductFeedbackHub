@@ -179,10 +179,10 @@ Para erradicar el problema de sobreescritura accidental (*Lost Update Problem*) 
 
 ## 5. Implementación de la Aplicación Móvil en React Native
 
-La aplicación móvil construida en el directorio `mobile/` cumple con los lineamientos del desarrollo móvil moderno y las directrices de la rúbrica académica:
+La aplicación móvil construida en el directorio `projects/mobile/` cumple con los lineamientos del desarrollo móvil moderno y las directrices de la rúbrica académica:
 
 ### 5.1. Características Técnicas Implementadas
-1. **Tipado Estricto con TypeScript:** Interfaces completas (`Ticket`, `TicketPriority`, `TicketStatus`, `TicketCategory`) en `mobile/src/types/ticket.ts`.
+1. **Tipado Estricto con TypeScript:** Interfaces completas (`Ticket`, `TicketPriority`, `TicketStatus`, `TicketCategory`) en `projects/mobile/src/types/ticket.ts`.
 2. **Gestión de Estado Reactivo con Hooks Obligatorios:**
    * `useState`: Para control de formularios locales, validaciones bajo el input y filtros dinámicos.
    * `useEffect`: Para carga inicial del repositorio en memoria y refresco de estadísticas.

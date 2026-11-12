@@ -13,11 +13,12 @@ Este documento sirve como **índice maestro y mapa de acceso directo** a todos l
 
 ```text
 proyecto-sexto-ciclo/
+├── projects/                  # Código fuente de las aplicaciones y software ejecutable
+│   └── mobile/                # Aplicación Móvil (React Native + Expo SDK 58 + Web)
 ├── docs/                      # Documentación centralizada del proyecto
 │   ├── arquitectura/          # Especificaciones técnicas, BD MySQL, Backend .NET y diagramas
 │   ├── academico/             # Informes Word/PDF, diapositivas y matriz Scrum de IDAT
 │   └── exposicion/            # Guiones de sustentación, manuales y hojas imprimibles
-├── mobile/                    # Código fuente de la Aplicación Móvil (React Native + Expo SDK 58)
 ├── design/                    # Diseños visuales, maquetas previas y tokens de interfaz
 ├── tools/                     # Scripts utilitarios en Python y activos gráficos de soporte
 ├── README.md                  # Documentación principal del repositorio y guía de la App
@@ -72,12 +73,12 @@ Materiales para coordinar la exposición frente al jurado evaluador o docente:
 
 ---
 
-### 4. 📱 Código Fuente de la Aplicación Móvil (`mobile/`)
+### 4. 📱 Código Fuente de la Aplicación Móvil (`projects/mobile/`)
 
 Proyecto en React Native con TypeScript, Expo SDK 58 y soporte Web:
 
 ```text
-mobile/
+projects/mobile/
 ├── src/
 │   ├── api/                      # ticketsApi.ts (CRUD en memoria, simulación HTTP 409)
 │   ├── components/               # TicketCard, StatusBadge, PriorityBadge, Button, InputText, Icons
@@ -94,9 +95,9 @@ mobile/
 ```
 
 #### Comandos Rápidos de Ejecución:
-* **Iniciar en Móvil (Expo Go):** `cd mobile` ➔ `npx expo start`
-* **Iniciar en Web (Navegador):** `cd mobile` ➔ `npx expo start --web`
-* **Verificar Compilación TypeScript:** `cd mobile` ➔ `npx tsc --noEmit`
+* **Iniciar en Móvil (Expo Go):** `cd projects/mobile` ➔ `npx expo start`
+* **Iniciar en Web (Navegador):** `cd projects/mobile` ➔ `npx expo start --web`
+* **Verificar Compilación TypeScript:** `cd projects/mobile` ➔ `npx tsc --noEmit`
 
 ---
 

@@ -26,7 +26,7 @@
 ## ⚙️ Checklist Técnico Previo a la Exposición
 
 Antes de que el jurado inicie la sesión, asegúrense de cumplir con lo siguiente:
-1. **Servidor Expo Activo:** En la terminal de la máquina del presentador, ejecutar dentro de `mobile/`:
+1. **Servidor Expo Activo:** En la terminal de la máquina del presentador, ejecutar dentro de `projects/mobile/`:
    ```bash
    npx expo start
    ```
@@ -98,7 +98,7 @@ Antes de que el jurado inicie la sesión, asegúrense de cumplir con lo siguient
 
 > **🗣️ Qué decir:**
 > 
-> "Muchas gracias, Aldair. Estimado docente, para garantizar un código profesional, escalable y mantenible, estructuramos la aplicación bajo una **arquitectura desacoplada por capas** dentro del directorio `mobile/src/`:  
+> "Muchas gracias, Aldair. Estimado docente, para garantizar un código profesional, escalable y mantenible, estructuramos la aplicación bajo una **arquitectura desacoplada por capas** dentro del directorio `projects/mobile/src/`:  
 > - **Screens:** Contiene las pantallas principales (Login, Dashboard, Listado, Formulario y Detalle).  
 > - **Components:** Componentes reutilizables modulares como tarjetas de incidencias, insignias semánticas de estado y severidad, e iconos SVG vectoriales.  
 > - **Context & Reducer:** La columna vertebral de la aplicación que administra el estado global.  

@@ -267,7 +267,7 @@ def create_printable_script():
     # CHECKLIST PREVIO A EXPONER
     # =============================================================
     h1("1. Checklist Rápido (5 Minutos Antes de Entrar)")
-    bullet("Tener la terminal abierta en la carpeta 'mobile' con el comando: npx expo start", "[1] Servidor Expo Iniciado: ")
+    bullet("Tener la terminal abierta en la carpeta 'projects/mobile' con el comando: npx expo start", "[1] Servidor Expo Iniciado: ")
     bullet("Celular con la app abierta en Expo Go, proyectado vía USB con 'scrcpy' (o emulador de Android Studio visible con la tecla 'a').", "[2] Pantalla Proyectada: ")
     bullet("Si el Wi-Fi de IDAT aísla dispositivos, iniciar con: npx expo start --tunnel", "[3] Conectividad Wi-Fi: ")
     bullet("Tener impreso este guion físico sobre la mesa para evitar distracciones en pantalla.", "[4] Material Físico: ")
@@ -312,7 +312,7 @@ def create_printable_script():
     add_speech_box(
         "Henry Monroy",
         "Gracias, Aldair. Estimado docente, la arquitectura de nuestra aplicación se construyó siguiendo buenas prácticas "
-        "de separación por capas dentro de 'mobile/src/':\n"
+        "de separación por capas dentro de 'projects/mobile/src/':\n"
         "• Screens: Pantallas limpias desacopladas de la persistencia.\n"
         "• Components: Tarjetas modulares, badges de severidad e iconografía SVG por tipo de servicio.\n"
         "• Models y Types: Tipado TypeScript estricto de la entidad principal 'Ticket' con los campos obligatorios: id, "

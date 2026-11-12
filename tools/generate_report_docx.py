@@ -602,17 +602,17 @@ def create_report():
     h2("4.1 Organización de capas en la aplicación móvil")
     p_body(
         "El código fuente se encuentra estructurado bajo principios de separación de responsabilidades dentro de la carpeta "
-        "'mobile/src/', facilitando el mantenimiento y la escalabilidad:"
+        "'projects/mobile/src/', facilitando el mantenimiento y la escalabilidad:"
     )
 
     arch_headers = ["Directorio", "Responsabilidad Arquitectónica", "Archivos Principales"]
     arch_rows = [
-        ["mobile/src/screens/", "Pantallas de interfaz de usuario y captura de eventos", "LoginScreen, RegisterScreen, HomeScreen, TicketListScreen, TicketFormScreen, TicketDetailScreen"],
-        ["mobile/src/components/", "Componentes visuales modulares y reutilizables", "TicketCard, TicketStatusBadge, TicketPriorityBadge, Input, Button, SVG Icons"],
-        ["mobile/src/context/", "Gestión del estado global con useReducer y Context API", "TicketContext.tsx (CRUD y reducer), AuthContext.tsx (autenticación)"],
-        ["mobile/src/models/ & types/", "Definición de modelos de dominio y contratos TypeScript", "ticket.ts, ticket.model.ts, auth.ts, navigation.ts"],
-        ["mobile/src/api/", "Repositorio de datos en memoria y simulación de concurrencia", "ticketsApi.ts (almacén en memoria, delays de red simulados, HTTP 409)"],
-        ["mobile/src/utils/", "Utilidades transversales, almacenamiento seguro y tema UI", "theme.ts (paleta dark mode, espaciados), secureStore.ts, formatters.ts"]
+        ["projects/mobile/src/screens/", "Pantallas de interfaz de usuario y captura de eventos", "LoginScreen, RegisterScreen, HomeScreen, TicketListScreen, TicketFormScreen, TicketDetailScreen"],
+        ["projects/mobile/src/components/", "Componentes visuales modulares y reutilizables", "TicketCard, TicketStatusBadge, TicketPriorityBadge, Input, Button, SVG Icons"],
+        ["projects/mobile/src/context/", "Gestión del estado global con useReducer y Context API", "TicketContext.tsx (CRUD y reducer), AuthContext.tsx (autenticación)"],
+        ["projects/mobile/src/models/ & types/", "Definición de modelos de dominio y contratos TypeScript", "ticket.ts, ticket.model.ts, auth.ts, navigation.ts"],
+        ["projects/mobile/src/api/", "Repositorio de datos en memoria y simulación de concurrencia", "ticketsApi.ts (almacén en memoria, delays de red simulados, HTTP 409)"],
+        ["projects/mobile/src/utils/", "Utilidades transversales, almacenamiento seguro y tema UI", "theme.ts (paleta dark mode, espaciados), secureStore.ts, formatters.ts"]
     ]
     add_styled_table(arch_headers, arch_rows, [1.5, 2.5, 2.5])
 

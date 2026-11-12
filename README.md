@@ -52,10 +52,10 @@ La entidad principal `Ticket` cumple con los campos obligatorios establecidos po
 
 ## 🏗️ Arquitectura y Estructura del Proyecto
 
-El proyecto sigue una separación clara de responsabilidades por capas en `mobile/src/`:
+El proyecto sigue una separación clara de responsabilidades por capas en `projects/mobile/src/`:
 
 ```text
-mobile/
+projects/mobile/
 ├── src/
 │   ├── api/                      # Simulación de servicios CRUD y persistencia en memoria
 │   ├── components/               # Componentes reutilizables (TicketCard, StatusBadge, Botones, Inputs)
@@ -143,7 +143,7 @@ git clone https://github.com/Eduardo25042103/mobileapp_PlatformOps-ProductFeedba
 cd mobileapp_PlatformOps-ProductFeedbackHub
 
 # 2. Navegar al directorio mobile
-cd mobile
+cd projects/mobile
 
 # 3. Instalar las dependencias del proyecto
 npm install
