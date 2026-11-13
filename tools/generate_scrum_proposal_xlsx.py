@@ -164,32 +164,32 @@ def main():
 
     # Los 30 requerimientos del usuario
     ru_list = [
-        ("RU01", "El empleado de la empresa debe poder iniciar sesión con su correo corporativo y contraseña para acceder a las herramientas de su área de forma segura.", "Presentación", "Backend .NET (JWT) / Mobile React Native / Web Angular", "Sprint 1", "Planificado"),
-        ("RU02", "El nuevo colaborador debe poder registrar su cuenta seleccionando su departamento (Soporte, TI/Desarrollo, Ventas, Marketing) para recibir las atribuciones de su rol.", "Presentación", "Base de Datos MySQL / Backend .NET / Mobile & Web", "Sprint 1", "Planificado"),
-        ("RU03", "El empleado debe disponer de una sesión persistente y protegida en su teléfono para no tener que ingresar sus credenciales en cada uso.", "Presentación", "Mobile React Native (SecureStore / LocalStorage)", "Sprint 1", "Planificado"),
-        ("RU04", "El usuario debe poder consultar su perfil y roles asignados, con la opción de actualizar su contraseña periódicamente.", "Presentación", "Backend .NET / Mobile React Native / Web Angular", "Sprint 1", "Planificado"),
-        ("RU05", "El administrador debe poder mantener el catálogo de empresas clientes de la plataforma SaaS, registrando su plan contratado y estado comercial.", "Tablas maestras", "Base de Datos MySQL / Backend .NET / Web Angular", "Sprint 2", "Planificado"),
-        ("RU06", "El personal interno debe poder consultar la lista de contactos autorizados por cada empresa cliente para validar la legitimidad de un reporte.", "Tablas maestras", "Base de Datos MySQL / Backend .NET / Web Angular", "Sprint 2", "Planificado"),
-        ("RU07", "El equipo técnico debe contar con un catálogo estandarizado de tipos de falla (Autenticación, Firma Electrónica, Base de Datos, APIs) para categorizar los problemas.", "Tablas maestras", "Base de Datos MySQL / Backend .NET / Mobile React Native", "Sprint 1", "Planificado"),
-        ("RU08", "Los colaboradores deben contar con niveles de severidad predefinidos (P1 a P4) para distinguir fallas críticas que paralizan a un cliente de detalles menores.", "Tablas maestras", "Base de Datos MySQL / Mobile React Native (Badges)", "Sprint 1", "Planificado"),
-        ("RU09", "El agente de soporte debe poder registrar incidencias técnicas reportadas por clientes SaaS, indicando el problema, cliente afectado y nivel de urgencia.", "TRANSACCIONES", "Base de Datos MySQL / Backend .NET / Mobile React Native", "Sprint 1", "Planificado"),
-        ("RU10", "El usuario debe poder adjuntar capturas de pantalla tomadas desde su teléfono para documentar el error técnico ante los desarrolladores.", "TRANSACCIONES", "Mobile React Native (ImagePicker) / Storage S3", "Sprint 1", "Planificado"),
-        ("RU11", "El desarrollador de TI debe poder actualizar el estado de una incidencia (En Diagnóstico, En Desarrollo, Resuelto) asegurando que sus cambios no sobreescriban notas hechas por otro colega al mismo tiempo.", "TRANSACCIONES", "Base de Datos MySQL / Backend .NET (HTTP 409) / Mobile", "Sprint 1", "Planificado"),
-        ("RU12", "El agente de soporte debe poder escalar formalmente un ticket al equipo de programadores cuando el problema requiere intervención en el código fuente.", "TRANSACCIONES", "Backend .NET / Web Angular / Mobile React Native", "Sprint 2", "Planificado"),
-        ("RU13", "El personal de cualquier área debe poder agregar comentarios y aclaraciones técnicas en el historial de la incidencia.", "TRANSACCIONES", "Base de Datos MySQL / Backend .NET / Mobile & Web", "Sprint 2", "Planificado"),
-        ("RU14", "El ejecutivo de ventas debe poder registrar pedidos de nuevas funciones (Feature Requests) solicitadas por clientes durante sus reuniones comerciales.", "TRANSACCIONES", "Base de Datos MySQL / Backend .NET / Web Angular", "Sprint 2", "Planificado"),
-        ("RU15", "Los colaboradores de Ventas y Marketing deben poder votar y respaldar solicitudes de clientes para impulsar su desarrollo en el producto.", "TRANSACCIONES", "Backend .NET / Web Angular", "Sprint 2", "Planificado"),
+        ("RU01", "El empleado de la empresa debe poder iniciar sesión con su correo corporativo y contraseña para acceder a las herramientas de su área de forma segura.", "Presentación", "Backend .NET (JWT) / Mobile React Native / Web Angular", "Sprint 1", "Terminado (100%)"),
+        ("RU02", "El nuevo colaborador debe poder registrar su cuenta seleccionando su departamento (Soporte, TI/Desarrollo, Ventas, Marketing) para recibir las atribuciones de su rol.", "Presentación", "Base de Datos MySQL / Backend .NET / Mobile & Web", "Sprint 1", "Terminado (100%)"),
+        ("RU03", "El empleado debe disponer de una sesión persistente y protegida en su teléfono para no tener que ingresar sus credenciales en cada uso.", "Presentación", "Mobile React Native (SecureStore / LocalStorage)", "Sprint 1", "Terminado (100%)"),
+        ("RU04", "El usuario debe poder consultar su perfil y roles asignados, con la opción de actualizar su contraseña periódicamente.", "Presentación", "Backend .NET / Mobile React Native / Web Angular", "Sprint 1", "Terminado (100%)"),
+        ("RU05", "El administrador debe poder mantener el catálogo de empresas clientes de la plataforma SaaS, registrando su plan contratado y estado comercial.", "Tablas maestras", "Base de Datos MySQL / Backend .NET / Web Angular", "Sprint 2", "En Desarrollo"),
+        ("RU06", "El personal interno debe poder consultar la lista de contactos autorizados por cada empresa cliente para validar la legitimidad de un reporte.", "Tablas maestras", "Base de Datos MySQL / Backend .NET / Web Angular", "Sprint 2", "En Desarrollo"),
+        ("RU07", "El equipo técnico debe contar con un catálogo estandarizado de tipos de falla (Autenticación, Firma Electrónica, Base de Datos, APIs) para categorizar los problemas.", "Tablas maestras", "Base de Datos MySQL / Backend .NET / Mobile React Native", "Sprint 1", "Terminado (100%)"),
+        ("RU08", "Los colaboradores deben contar con niveles de severidad predefinidos (P1 a P4) para distinguir fallas críticas que paralizan a un cliente de detalles menores.", "Tablas maestras", "Base de Datos MySQL / Mobile React Native (Badges)", "Sprint 1", "Terminado (100%)"),
+        ("RU09", "El agente de soporte debe poder registrar incidencias técnicas reportadas por clientes SaaS, indicando el problema, cliente afectado y nivel de urgencia.", "TRANSACCIONES", "Base de Datos MySQL / Backend .NET / Mobile React Native", "Sprint 1", "Terminado (100%)"),
+        ("RU10", "El usuario debe poder adjuntar capturas de pantalla tomadas desde su teléfono para documentar el error técnico ante los desarrolladores.", "TRANSACCIONES", "Mobile React Native (ImagePicker) / Storage S3", "Sprint 1", "Terminado (100%)"),
+        ("RU11", "El desarrollador de TI debe poder actualizar el estado de una incidencia (En Diagnóstico, En Desarrollo, Resuelto) asegurando que sus cambios no sobreescriban notas hechas por otro colega al mismo tiempo.", "TRANSACCIONES", "Base de Datos MySQL / Backend .NET (HTTP 409) / Mobile", "Sprint 1", "Terminado (100%)"),
+        ("RU12", "El agente de soporte debe poder escalar formalmente un ticket al equipo de programadores cuando el problema requiere intervención en el código fuente.", "TRANSACCIONES", "Backend .NET / Web Angular / Mobile React Native", "Sprint 2", "En Desarrollo"),
+        ("RU13", "El personal de cualquier área debe poder agregar comentarios y aclaraciones técnicas en el historial de la incidencia.", "TRANSACCIONES", "Base de Datos MySQL / Backend .NET / Mobile & Web", "Sprint 2", "En Desarrollo"),
+        ("RU14", "El ejecutivo de ventas debe poder registrar pedidos de nuevas funciones (Feature Requests) solicitadas por clientes durante sus reuniones comerciales.", "TRANSACCIONES", "Base de Datos MySQL / Backend .NET / Web Angular", "Sprint 2", "En Desarrollo"),
+        ("RU15", "Los colaboradores de Ventas y Marketing deben poder votar y respaldar solicitudes de clientes para impulsar su desarrollo en el producto.", "TRANSACCIONES", "Backend .NET / Web Angular", "Sprint 2", "En Desarrollo"),
         ("RU16", "El usuario debe recibir avisos y actualizaciones inmediatas en su pantalla cuando un ticket cambie de estado, sin tener que recargar manualmente la app.", "Procesos", "Backend .NET (SignalR / WebSockets) / Mobile & Web", "Sprint 3", "Planificado"),
         ("RU17", "El equipo de producto debe ver reflejado automáticamente el impacto económico ($ contratado) en las sugerencias de mejora cuando Ventas registre un pedido en Zoho CRM.", "Procesos", "Backend .NET (Zoho CRM Webhook) / BD MySQL", "Sprint 3", "Planificado"),
         ("RU18", "El personal de soporte y TI debe ser alertado automáticamente cuando un ticket esté próximo a vencer el tiempo límite de atención pactado (SLA).", "Procesos", "Backend .NET (Background Worker) / Mobile & Web Push", "Sprint 3", "Planificado"),
         ("RU19", "El líder de producto debe contar con una priorización automática que clasifique las mejoras considerando el valor de los clientes vs. la dificultad técnica estimada por TI.", "Procesos", "Backend .NET (Algoritmo Matriz Valor/Esfuerzo) / Web", "Sprint 3", "Planificado"),
-        ("RU20", "El personal técnico debe disponer de una bandeja de incidencias con filtros rápidos por urgencia y buscador para localizar tickets inmediatamente.", "Listados", "Mobile React Native (TicketListScreen) / Web Angular", "Sprint 1", "Planificado"),
-        ("RU21", "El colaborador debe visualizar un tablero principal (Dashboard) que resuma los incidentes abiertos y las prioridades de atención de su turno.", "Listados", "Web Angular (Dashboard) / Mobile React Native (HomeScreen)", "Sprint 2", "Planificado"),
-        ("RU22", "El equipo de desarrollo debe poder consultar una lista exclusiva de los tickets técnicos asignados a su persona.", "Listados", "Backend .NET / Mobile React Native / Web Angular", "Sprint 2", "Planificado"),
-        ("RU23", "El área comercial debe poder revisar el catálogo de clientes SaaS con sus notas internas sobre comportamiento o riesgo de cancelación.", "Consultas", "Base de Datos MySQL / Web Angular (Vista CRM)", "Sprint 2", "Planificado"),
+        ("RU20", "El personal técnico debe disponer de una bandeja de incidencias con filtros rápidos por urgencia y buscador para localizar tickets inmediatamente.", "Listados", "Mobile React Native (TicketListScreen) / Web Angular", "Sprint 1", "Terminado (100%)"),
+        ("RU21", "El colaborador debe visualizar un tablero principal (Dashboard) que resuma los incidentes abiertos y las prioridades de atención de su turno.", "Listados", "Web Angular (Dashboard) / Mobile React Native (HomeScreen)", "Sprint 2", "En Desarrollo"),
+        ("RU22", "El equipo de desarrollo debe poder consultar una lista exclusiva de los tickets técnicos asignados a su persona.", "Listados", "Backend .NET / Mobile React Native / Web Angular", "Sprint 2", "En Desarrollo"),
+        ("RU23", "El área comercial debe poder revisar el catálogo de clientes SaaS con sus notas internas sobre comportamiento o riesgo de cancelación.", "Consultas", "Base de Datos MySQL / Web Angular (Vista CRM)", "Sprint 2", "En Desarrollo"),
         ("RU24", "El equipo de marketing y producto debe disponer de una vista del Roadmap con las funciones en evaluación, desarrollo y lanzamiento.", "Consultas", "Web Angular (Kanban Roadmap) / Mobile React Native", "Sprint 3", "Planificado"),
         ("RU25", "El supervisor de soporte debe poder consultar indicadores de cumplimiento de tiempos de respuesta y resolución por cada tipo de cliente.", "Consultas", "Base de Datos MySQL (Vistas analíticas) / Web Angular", "Sprint 3", "Planificado"),
-        ("RU26", "El programador debe poder inspeccionar a detalle los archivos adjuntos y trazas de logs asociados a un incidente para reproducir la falla.", "Consultas", "Mobile React Native / Web Angular / S3 Storage", "Sprint 2", "Planificado"),
+        ("RU26", "El programador debe poder inspeccionar a detalle los archivos adjuntos y trazas de logs asociados a un incidente para reproducir la falla.", "Consultas", "Mobile React Native / Web Angular / S3 Storage", "Sprint 2", "En Desarrollo"),
         ("RU27", "El ejecutivo de ventas debe poder consultar el historial de incidencias y solicitudes pasadas de un cliente antes de una reunión de renovación.", "Consultas", "Base de Datos MySQL / Web Angular (Ficha 360)", "Sprint 3", "Planificado"),
         ("RU28", "El equipo de TI debe poder publicar avisos urgentes sobre caídas de infraestructura y mantenimientos programados para toda la organización.", "Otros", "Backend .NET / Web Angular / Mobile React Native (Banner)", "Sprint 3", "Planificado"),
         ("RU29", "El equipo de marketing debe poder publicar notas de versión (Changelogs) para que toda la empresa conozca las nuevas funciones liberadas.", "Otros", "Backend .NET / Web Angular / Mobile React Native", "Sprint 3", "Planificado"),
@@ -532,7 +532,21 @@ def main():
                 ws_sp.cell(current_r, 10, t_resp) # J: Responsable
                 ws_sp.cell(current_r, 11, f_ini)  # K: Fecha Inicio
                 ws_sp.cell(current_r, 12, f_fin)  # L: Fecha Fin
-                ws_sp.cell(current_r, 13, "Conforme 100%") # M: Resultado
+                # Resultado acorde al avance real del proyecto (Sustentación blindada)
+                if s_name == "Sprint 1":
+                    resultado_val = "Conforme 100%"
+                elif s_name == "Sprint 2":
+                    if "Base de Datos" in t_tipo or "Backend" in t_tipo:
+                        resultado_val = "Conforme 100%"
+                    else:
+                        resultado_val = "En Proceso"
+                else: # Sprint 3
+                    if "Base de Datos" in t_tipo or "Backend" in t_tipo:
+                        resultado_val = "En Proceso"
+                    else:
+                        resultado_val = "Planificado"
+
+                ws_sp.cell(current_r, 13, resultado_val) # M: Resultado
 
                 for c_idx in range(2, 14):
                     c = ws_sp.cell(current_r, c_idx)
