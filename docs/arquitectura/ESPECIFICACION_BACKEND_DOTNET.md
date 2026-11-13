@@ -205,6 +205,35 @@ Las bases de datos relacionales en instancias pequeñas como `db.t4g.micro` sopo
 * `MinPoolSize=0`: No retiene conexiones ociosas cuando no hay tráfico.
 * `MaxPoolSize=3`: Limita el número de conexiones simultáneas por contenedor de Lambda.
 
+### 5.4. Infraestructura como Código (IaC) con AWS SAM y CloudFormation
+La infraestructura serverless completa se define en `projects/backend/src/OpsHub.Api/serverless.template` utilizando **AWS Serverless Application Model (SAM)**:
+* **AWS API Gateway (HTTP API v2):** Se utiliza la versión moderna HTTP API con Payload Format Version 2.0. Proporciona ~10 ms de latencia (vs ~35 ms de REST API tradicional) y reduce los costos en un 70%.
+* **Configuración CORS Centralizada:** Habilitado para orígenes cruzados (`*`) permitiendo cabeceras requeridas (`Authorization`, `Content-Type`, `X-Zoho-Signature`, `X-Client-Platform`).
+* **Enrutamiento Codicioso (Greedy Proxy):** Captura todas las peticiones bajo `ANY /` y `ANY /{proxy+}` derivándolas al motor de enrutamiento interno de ASP.NET Core.
+* **Políticas IAM de Mínimo Privilegio:** Rol de ejecución exclusivo con permisos para CloudWatch Logs (`AWSLambdaBasicExecutionRole`) y permisos `s3:GetObject` y `s3:PutObject` acotados al bucket de adjuntos.
+
+### 5.5. Mitigación de Arranque en Frío (Cold Start)
+Para garantizar tiempos de respuesta sub-segundo incluso en invocaciones iniciales:
+1. **Publicación Self-Contained para Linux (`linux-x64`):** El binario se publica empaquetando el runtime .NET 10 optimizado con el archivo de inicio `bootstrap`, eliminando la necesidad de capas (layers) externas y reduciendo la inicialización.
+2. **Dimensionamiento de Memoria (1024 MB):** En AWS Lambda, la asignación de vCPU es directamente proporcional a la memoria. Asignar 1024 MB otorga un núcleo de CPU completo a la función durante el arranque.
+3. **Mapeo Liviano de Dependencias:** El registro de servicios en Clean Architecture utiliza inyecciones `AddScoped` y `AddSingleton` evaluadas perezosamente (lazy initialization).
+
+### 5.6. Guía de Empaquetado y Despliegue
+
+```bash
+# Opción 1: Empaquetado automatizado con el script de PowerShell
+.\projects\backend\deploy-lambda.ps1 -Action Package -Stage prod
+
+# Opción 2: Despliegue automatizado con AWS SAM CLI
+sam build -t projects/backend/src/OpsHub.Api/serverless.template
+sam deploy --guided
+
+# Opción 3: Actualización directa de código mediante AWS CLI
+aws lambda update-function-code \
+    --function-name opshub-backend-prod \
+    --zip-file fileb://projects/backend/bin/opshub-backend-lambda.zip
+```
+
 ---
 
 ## 6. Guía de Sustentación para el Jurado Calificador (IDAT VI Ciclo)
@@ -222,3 +251,9 @@ Las bases de datos relacionales en instancias pequeñas como `db.t4g.micro` sopo
 
 #### 4. ¿Cómo manejan la seguridad de las credenciales de base de datos y AWS?
 > *"Aplicamos el principio de menor privilegio. Para los servicios de AWS, no utilizamos contraseñas ni claves de acceso estáticas; la función Lambda asume un rol de IAM con credenciales temporales gestionadas por la nube. Para la conexión a MySQL y el secreto de firma JWT, se inyectan como variables de entorno cifradas en reposo mediante AWS KMS en la consola de Lambda, sin que ningún dato sensible resida en el repositorio de código."*
+
+#### 5. ¿Por qué desplegar un Web API completo en AWS Lambda en lugar de una función por cada endpoint?
+> *"Optamos por el patrón Serverless Web API (Monolito en Lambda con `Amazon.Lambda.AspNetCoreServer.Hosting`). Dividir 31 endpoints en 31 funciones Lambda individuales aumentaría drásticamente los arranques en frío (cold starts), multiplicaría la complejidad de despliegue y fragmentaría el código. Al albergar el Web API en una función Lambda optimizada con HTTP API v2, los contenedores calientes se reutilizan para cualquier endpoint, compartimos el pool de conexiones a MySQL y mantenemos la solución bajo Clean Architecture estándar de la industria."*
+
+#### 6. ¿Cómo auditan los cambios críticos en la base de datos para cumplimiento normativo?
+> *"Implementamos un interceptor automático en EF Core (`AuditLogsInterceptor`). Cada vez que se confirma una transacción (`SaveChangesAsync`), el interceptor inspecciona el ChangeTracker, identifica las entidades creadas, editadas o eliminadas, enmascara credenciales por seguridad y registra en la tabla `logs_actividad` el usuario, la IP, la plataforma y los estados en JSON (`valores_anteriores_json` y `valores_nuevos_json`), garantizando trazabilidad forense sin intervención manual en los controladores."*

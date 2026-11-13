@@ -54,7 +54,8 @@ Documentos institucionales alineados con las pautas del Trabajo de Aplicación P
 |---|:---:|---|
 | [**`informe-parcial.docx`**](docs/academico/informe-parcial.docx) | Word (`.docx`) | **Informe Académico Formal Completo (Capítulos 1 al 7).** 192 párrafos, 7 tablas institucionales y 9 figuras con formato APA 7ma edición, listo para imprimir o exportar a PDF. |
 | [**`Portal_TuNegocio_Presentacion.pptx`**](docs/academico/Portal_TuNegocio_Presentacion.pptx) | PowerPoint | Presentación formal de 18 diapositivas estructurada con organigrama, diagnóstico, objetivos y stack tecnológico. |
-| [**`Fase_02_Actividad_02A_Scrum_Artefactos_Ceremonias_COPIA.xlsx`**](docs/academico/Fase_02_Actividad_02A_Scrum_Artefactos_Ceremonias_COPIA.xlsx) | Excel | Matriz ágil de gestión del proyecto (Product Backlog, Sprint Planning, Burndown y ceremonias Scrum). |
+| [**`Fase_02_Actividad_02A_Scrum_Artefactos_Ceremonias_PROPUESTA_EQUIPO.xlsx`**](docs/academico/Fase_02_Actividad_02A_Scrum_Artefactos_Ceremonias_PROPUESTA_EQUIPO.xlsx) | Excel (`.xlsx`) | **Propuesta Consolidada de Gestión Ágil Scrum (3 Sprints).** Distribución de los 30 Requerimientos de Usuario (RU), 30 Historias de Usuario (HU), trazabilidad multicapa (MySQL, .NET, Angular, React Native) y Sprint Planning descompuesto por integrante. |
+| [**`Fase_02_Actividad_02A_Scrum_Artefactos_Ceremonias_COPIA.xlsx`**](docs/academico/Fase_02_Actividad_02A_Scrum_Artefactos_Ceremonias_COPIA.xlsx) | Excel | Plantilla base original de IDAT respaldada. |
 | [**`4.1 Estructura del proyecto_Idat_PROYECTO DE APLICACIÓN EMPRESARIAL.pdf`**](docs/academico/4.1%20Estructura%20del%20proyecto_Idat_PROYECTO%20DE%20APLICACIÓN%20EMPRESARIAL.pdf) | PDF | Manual y estructura oficial de evaluación emitida por IDAT. |
 | [**`4.1 Estructura del proyecto_Idat_PROYECTO DE APLICACIÓN EMPRESARIAL (1).docx`**](docs/academico/4.1%20Estructura%20del%20proyecto_Idat_PROYECTO%20DE%20APLICACIÓN%20EMPRESARIAL%20(1).docx) | Word | Plantilla editable institucional de IDAT. |
 
@@ -110,6 +111,7 @@ projects/mobile/
 
 ### 6. 🛠️ Herramientas y Scripts Utilitarios (`tools/`)
 
+* **`tools/generate_scrum_proposal_xlsx.py`**: Generador y formateador automatizado del libro Excel de Scrum (Fase 02 - Actividad 02A) con openpyxl.
 * **`tools/generate_report_docx.py`**: Generador automático del informe académico en formato Word utilizando `python-docx`.
 * **`tools/generate_guion_docx.py`**: Generador del guion imprimible con cajas de acción y estilos de lectura.
 * **`tools/create_mockups.py`**: Script con Pillow (PIL) para renderizar las 6 capturas de pantalla de la app móvil.
