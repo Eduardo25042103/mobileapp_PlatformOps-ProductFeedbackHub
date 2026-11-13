@@ -336,7 +336,7 @@ def main():
     # B: SPRINT | C: META Funcionando al 100% | D: ID_SPB | E: Nombre del SPB | F: ID_Tarea | G: Descripción Descomposición Tareas | H: Tipo Tarea | I: Estimación (h) | J: Responsable | K: Fecha Inicio | L: Fecha Fin | M: RESULTADO
     sp_headers = ["SPRINT", "META Funcionando al 100% (Sprint Goal)", "ID_SPB", "Nombre del SPB", "ID_Tarea", "Descripción de la Descomposición de Tareas Técnicas", "Tipo Tarea", "Estimación (h)", "Responsable", "Fecha Inicio", "Fecha Fin", "RESULTADO"]
 
-    # Definir estructura de tareas por Sprint
+    # Definir estructura de tareas por Sprint (Los 10 SPB por Sprint ordenados correlativamente)
     sprints_plan = [
         {
             "sprint_name": "Sprint 1",
@@ -345,28 +345,49 @@ def main():
             "dates": ("21/09/2026", "16/10/2026"),
             "items": [
                 ("HU01", "Acceso Seguro con JWT", [
-                    ("T1.1", "Base de Datos: Diseño y creación de tablas 'usuarios', 'roles' y 'credenciales' con constraints.", "Base de Datos", 8, "Morales Quiroga, Josue David"),
-                    ("T1.2", "Backend: Implementar endpoint 'POST /api/v1/auth/login' con generación y firma de tokens JWT.", "Backend .NET", 10, "Monroy Gutiérrez, Henry Raul"),
-                    ("T1.3", "Mobile: Crear interfaz de LoginScreen con validaciones visuales y almacenamiento seguro de token.", "Frontend Mobile", 12, "Cahuana Ccallocunto, Aldair Santos"),
-                    ("T1.4", "Fullstack / QA: Pruebas unitarias de autenticación y verificación de seguridad de sesión.", "QA / Pruebas", 6, "Sánchez Peña, Eduardo Enrique")
+                    ("T1.01", "Base de Datos: Modelado e indexación de tablas 'usuarios', 'roles' y 'credenciales'.", "Base de Datos", 8, "Morales Quiroga, Josue David"),
+                    ("T1.02", "Backend: Implementar endpoint 'POST /api/v1/auth/login' con generación y firma de tokens JWT.", "Backend .NET", 10, "Monroy Gutiérrez, Henry Raul"),
+                    ("T1.03", "Mobile: Crear interfaz de LoginScreen con validaciones visuales y almacenamiento de token.", "Frontend Mobile", 10, "Cahuana Ccallocunto, Aldair Santos"),
+                    ("T1.04", "Fullstack / QA: Pruebas unitarias de autenticación y verificación de seguridad de sesión.", "QA / Pruebas", 6, "Sánchez Peña, Eduardo Enrique")
+                ]),
+                ("HU02", "Registro por Departamento", [
+                    ("T1.05", "Backend: Endpoint 'POST /api/v1/auth/register' con asignación automática de rol departamental.", "Backend .NET", 8, "Monroy Gutiérrez, Henry Raul"),
+                    ("T1.06", "Mobile: Pantalla RegisterScreen con selector dropdown de departamento institucional.", "Frontend Mobile", 8, "Cahuana Ccallocunto, Aldair Santos")
+                ]),
+                ("HU03", "Sesión Persistente en Móvil", [
+                    ("T1.07", "Mobile: Integración de expo-secure-store y context provider de sesión (AuthContext).", "Frontend Mobile", 6, "Cahuana Ccallocunto, Aldair Santos"),
+                    ("T1.08", "Fullstack: Verificación de persistencia offline y revalidación de token al abrir la app.", "QA / Pruebas", 4, "Sánchez Peña, Eduardo Enrique")
+                ]),
+                ("HU04", "Perfil de Usuario y Clave", [
+                    ("T1.09", "Backend: Endpoints 'GET /api/v1/usuarios/perfil' y 'PUT /api/v1/usuarios/password'.", "Backend .NET", 6, "Monroy Gutiérrez, Henry Raul"),
+                    ("T1.10", "Mobile: Modal de consulta de perfil de usuario y cambio periódico de contraseña.", "Frontend Mobile", 6, "Morales Quiroga, Josue David")
+                ]),
+                ("HU05", "Catálogo de Tipos de Falla", [
+                    ("T1.11", "Base de Datos: Poblado de tabla 'cat_categorias' (Firma, BD, Autenticación, Impresión, API).", "Base de Datos", 4, "Morales Quiroga, Josue David"),
+                    ("T1.12", "Mobile: Componentes de selección e iconografía SVG por tipo de falla técnica.", "Frontend Mobile", 6, "Cahuana Ccallocunto, Aldair Santos")
+                ]),
+                ("HU06", "Niveles de Severidad P1 a P4", [
+                    ("T1.13", "Base de Datos: Restricciones y ordenamiento en tabla 'cat_prioridades' (P1 a P4 con SLA base).", "Base de Datos", 4, "Morales Quiroga, Josue David"),
+                    ("T1.14", "Mobile: Componente reutilizable PriorityBadge con código de colores normalizado.", "Frontend Mobile", 4, "Cahuana Ccallocunto, Aldair Santos")
                 ]),
                 ("HU07", "Registro de Incidencias Técnicas", [
-                    ("T1.5", "Base de Datos: Creación de tabla 'tickets', secuencias de códigos correlativos ('INC-2026-XXX').", "Base de Datos", 8, "Morales Quiroga, Josue David"),
-                    ("T1.6", "Backend: Implementar controlador 'POST /api/v1/tickets' con validación de modelo y comandos CQRS.", "Backend .NET", 12, "Monroy Gutiérrez, Henry Raul"),
-                    ("T1.7", "Mobile: Pantalla TicketFormScreen con selectores de categoría, severidad y mensajes de error.", "Frontend Mobile", 12, "Cahuana Ccallocunto, Aldair Santos"),
-                    ("T1.8", "Fullstack: Pruebas de integración del formulario y validación de campos obligatorios.", "QA / Pruebas", 6, "Sánchez Peña, Eduardo Enrique")
+                    ("T1.15", "Base de Datos: Creación de tabla 'tickets', secuencias correlativas ('INC-2026-XXX').", "Base de Datos", 8, "Morales Quiroga, Josue David"),
+                    ("T1.16", "Backend: Implementar controlador 'POST /api/v1/tickets' con validación FluentValidation.", "Backend .NET", 10, "Monroy Gutiérrez, Henry Raul"),
+                    ("T1.17", "Mobile: Pantalla TicketFormScreen con gestión en memoria vía TicketContext.", "Frontend Mobile", 10, "Cahuana Ccallocunto, Aldair Santos")
+                ]),
+                ("HU08", "Carga de Evidencias Visuales", [
+                    ("T1.18", "Mobile: Integración de expo-image-picker para adjuntar capturas desde cámara o galería.", "Frontend Mobile", 8, "Cahuana Ccallocunto, Aldair Santos"),
+                    ("T1.19", "Backend / S3: Servicio de almacenamiento de imágenes adjuntas en Amazon S3.", "Backend .NET", 6, "Sánchez Peña, Eduardo Enrique")
                 ]),
                 ("HU09", "Actualización con Concurrencia Optimista", [
-                    ("T1.9", "Base de Datos: Añadir columna 'version' (INT) y trigger de incremento automático en la tabla 'tickets'.", "Base de Datos", 6, "Morales Quiroga, Josue David"),
-                    ("T1.10", "Backend: Lógica de concurrencia optimista en Application Layer con retorno de HTTP 409 Conflict.", "Backend .NET", 10, "Monroy Gutiérrez, Henry Raul"),
-                    ("T1.11", "Mobile: Manejo del error 409 en TicketDetailScreen con diálogo de recarga y preservación de datos.", "Frontend Mobile", 10, "Cahuana Ccallocunto, Aldair Santos"),
-                    ("T1.12", "DevOps: Pruebas de colisión concurrente simulando edición simultánea entre dos terminales.", "Fullstack / QA", 8, "Sánchez Peña, Eduardo Enrique")
+                    ("T1.20", "Base de Datos: Columna 'version' (INT) y control de concurrencia en la tabla 'tickets'.", "Base de Datos", 6, "Morales Quiroga, Josue David"),
+                    ("T1.21", "Backend: Detección de versión desactualizada y retorno de HTTP 409 Conflict.", "Backend .NET", 8, "Monroy Gutiérrez, Henry Raul"),
+                    ("T1.22", "Mobile: Manejo de colisión en TicketDetailScreen con diálogo de recarga y preservación.", "Frontend Mobile", 8, "Sánchez Peña, Eduardo Enrique")
                 ]),
                 ("HU10", "Bandeja y Búsqueda de Tickets", [
-                    ("T1.13", "Base de Datos: Índices compuestos en 'estado', 'prioridad' y 'codigo' para búsquedas de alto rendimiento.", "Base de Datos", 6, "Morales Quiroga, Josue David"),
-                    ("T1.14", "Backend: Endpoint 'GET /api/v1/tickets' con parámetros de paginación, búsqueda libre y filtros.", "Backend .NET", 10, "Monroy Gutiérrez, Henry Raul"),
-                    ("T1.15", "Mobile: TicketListScreen con barra de búsqueda reactiva, chips de estado y componente TicketCard.", "Frontend Mobile", 12, "Cahuana Ccallocunto, Aldair Santos"),
-                    ("T1.16", "Web: Maquetación base en Angular del layout principal y tabla responsiva de incidencias.", "Frontend Web", 10, "Morales Quiroga, Josue David")
+                    ("T1.23", "Base de Datos: Índices B-Tree compuestos en (estado, prioridad, created_at) para filtrado veloz.", "Base de Datos", 6, "Morales Quiroga, Josue David"),
+                    ("T1.24", "Mobile: TicketListScreen con barra de búsqueda reactiva, chips de estado y TicketCard.", "Frontend Mobile", 10, "Cahuana Ccallocunto, Aldair Santos"),
+                    ("T1.25", "Web: Inicialización del proyecto Angular con estructura de módulos y tabla responsiva.", "Frontend Web", 8, "Morales Quiroga, Josue David")
                 ])
             ]
         },
@@ -377,28 +398,49 @@ def main():
             "dates": ("19/10/2026", "13/11/2026"),
             "items": [
                 ("HU11", "Catálogo de Empresas Clientes SaaS", [
-                    ("T2.1", "Base de Datos: Creación de tablas 'empresas', 'planes_saas' y 'contactos_empresa' con claves foráneas.", "Base de Datos", 8, "Morales Quiroga, Josue David"),
-                    ("T2.2", "Backend: Endpoints CRUD '/api/v1/empresas' y '/api/v1/empresas/{id}/contactos' en Clean Architecture.", "Backend .NET", 10, "Monroy Gutiérrez, Henry Raul"),
-                    ("T2.3", "Web: Módulo administrativo en Angular con tabla interactiva de clientes SaaS y formulario modal.", "Frontend Web", 12, "Morales Quiroga, Josue David"),
-                    ("T2.4", "QA: Verificación de consistencia relacional y pruebas funcionales de alta de empresas.", "QA / Pruebas", 6, "Sánchez Peña, Eduardo Enrique")
+                    ("T2.01", "Base de Datos: Creación de tablas 'empresas' y 'planes_saas' con claves foráneas.", "Base de Datos", 8, "Morales Quiroga, Josue David"),
+                    ("T2.02", "Backend: Endpoints CRUD '/api/v1/empresas' y '/api/v1/empresas/{id}/contactos'.", "Backend .NET", 10, "Monroy Gutiérrez, Henry Raul"),
+                    ("T2.03", "Web: Módulo administrativo en Angular con tabla interactiva de clientes corporativos.", "Frontend Web", 10, "Morales Quiroga, Josue David")
+                ]),
+                ("HU12", "Contactos Autorizados por Cliente", [
+                    ("T2.04", "Base de Datos: Tabla 'contactos_empresa' con validación de correo corporativo y cargo.", "Base de Datos", 6, "Morales Quiroga, Josue David"),
+                    ("T2.05", "Web: Sub-tabla en Angular para validar contactos autorizados por empresa.", "Frontend Web", 8, "Morales Quiroga, Josue David")
                 ]),
                 ("HU13", "Escalación Formal de Soporte a TI", [
-                    ("T2.5", "Base de Datos: Tabla 'escalaciones_ticket' para auditoría de transferencias interdepartamentales.", "Base de Datos", 6, "Morales Quiroga, Josue David"),
-                    ("T2.6", "Backend: Servicio de dominio para escalación formal con validación de roles y notificación interna.", "Backend .NET", 10, "Monroy Gutiérrez, Henry Raul"),
-                    ("T2.7", "Mobile: Conectar botón 'Escalar a Desarrollo' consumiendo API REST desde client.ts en React Native.", "Frontend Mobile", 10, "Cahuana Ccallocunto, Aldair Santos"),
-                    ("T2.8", "Fullstack: Pruebas de integración del flujo de derivación entre perfiles Soporte y Desarrollador.", "QA / Pruebas", 8, "Sánchez Peña, Eduardo Enrique")
+                    ("T2.06", "Base de Datos: Tabla 'escalaciones_ticket' para auditoría de transferencias interdepartamentales.", "Base de Datos", 6, "Morales Quiroga, Josue David"),
+                    ("T2.07", "Backend: Servicio de escalación 'POST /api/v1/tickets/{id}/escalar' con notificación interna.", "Backend .NET", 8, "Monroy Gutiérrez, Henry Raul"),
+                    ("T2.08", "Mobile: Conectar botón 'Escalar a Desarrollo' consumiendo API REST desde client.ts.", "Frontend Mobile", 8, "Cahuana Ccallocunto, Aldair Santos")
                 ]),
-                ("HU15", "Feature Requests y Votación Comercial", [
-                    ("T2.9", "Base de Datos: Tablas 'feature_requests' y 'votos_feature_request' con unicidad por usuario/cliente.", "Base de Datos", 6, "Morales Quiroga, Josue David"),
-                    ("T2.10", "Backend: Endpoints para registro de sugerencias y sistema transaccional de votación (/api/v1/features).", "Backend .NET", 10, "Monroy Gutiérrez, Henry Raul"),
-                    ("T2.11", "Web: Interfaz en Angular para que Ventas y Marketing exploren y voten solicitudes de clientes.", "Frontend Web", 12, "Cahuana Ccallocunto, Aldair Santos"),
-                    ("T2.12", "Fullstack: Pruebas de concurrencia y validación de recuento de votos en tiempo real.", "QA / Pruebas", 6, "Sánchez Peña, Eduardo Enrique")
+                ("HU14", "Historial y Notas Técnicas", [
+                    ("T2.09", "Base de Datos: Tabla 'comentarios_ticket' con marcas temporales y roles de autor.", "Base de Datos", 6, "Morales Quiroga, Josue David"),
+                    ("T2.10", "Backend: Endpoints 'GET/POST /api/v1/tickets/{id}/comentarios' con paginación.", "Backend .NET", 8, "Monroy Gutiérrez, Henry Raul"),
+                    ("T2.11", "Mobile: Componente de timeline cronológico de notas técnicas en TicketDetailScreen.", "Frontend Mobile", 8, "Cahuana Ccallocunto, Aldair Santos")
                 ]),
-                ("HU17", "Dashboard Ejecutivo de Turno", [
-                    ("T2.13", "Base de Datos: Procedimiento almacenado 'sp_obtener_metricas_turno' para KPIs consolidados.", "Base de Datos", 8, "Morales Quiroga, Josue David"),
-                    ("T2.14", "Backend: Endpoint '/api/v1/dashboard/metricas' con caché en memoria y tiempos de respuesta < 100ms.", "Backend .NET", 8, "Monroy Gutiérrez, Henry Raul"),
-                    ("T2.15", "Web: Componente Dashboard en Angular con widgets de tarjetas, distribución P1-P4 y gráficos.", "Frontend Web", 12, "Morales Quiroga, Josue David"),
-                    ("T2.16", "Mobile: HomeScreen en React Native con resumen de estadísticas reactivas sincronizadas vía API.", "Frontend Mobile", 10, "Cahuana Ccallocunto, Aldair Santos")
+                ("HU15", "Registro de Feature Requests", [
+                    ("T2.12", "Base de Datos: Tabla 'feature_requests' vinculada a clientes y módulos SaaS.", "Base de Datos", 6, "Morales Quiroga, Josue David"),
+                    ("T2.13", "Backend: Controlador FeaturesController con comandos de creación y clasificación.", "Backend .NET", 8, "Monroy Gutiérrez, Henry Raul"),
+                    ("T2.14", "Web: Formulario en Angular para que ejecutivos de Ventas registren pedidos de clientes.", "Frontend Web", 10, "Cahuana Ccallocunto, Aldair Santos")
+                ]),
+                ("HU16", "Votación Colaborativa de Solicitudes", [
+                    ("T2.15", "Base de Datos: Tabla 'votos_feature_request' con restricción de voto único por usuario.", "Base de Datos", 4, "Morales Quiroga, Josue David"),
+                    ("T2.16", "Web: Interfaz interactiva de votación en Angular con contadores de respaldo en tiempo real.", "Frontend Web", 8, "Cahuana Ccallocunto, Aldair Santos")
+                ]),
+                ("HU17", "Dashboard Operativo de Turno", [
+                    ("T2.17", "Base de Datos: Procedimiento almacenado 'sp_obtener_metricas_turno' para KPIs consolidados.", "Base de Datos", 8, "Morales Quiroga, Josue David"),
+                    ("T2.18", "Web: Componente Dashboard en Angular con widgets de tarjetas, distribución P1-P4 y gráficos.", "Frontend Web", 10, "Morales Quiroga, Josue David"),
+                    ("T2.19", "Mobile: HomeScreen en React Native mostrando tarjetas con conteos de tickets del turno.", "Frontend Mobile", 8, "Cahuana Ccallocunto, Aldair Santos")
+                ]),
+                ("HU18", "Tickets Asignados al Programador", [
+                    ("T2.20", "Backend: Filtro por 'usuario_asignado_id' en query de tickets con autenticación JWT.", "Backend .NET", 6, "Monroy Gutiérrez, Henry Raul"),
+                    ("T2.21", "Mobile: Vista dedicada 'Mis Tickets' en React Native para el desarrollador en guardia.", "Frontend Mobile", 8, "Sánchez Peña, Eduardo Enrique")
+                ]),
+                ("HU19", "Catálogo Comercial y Riesgo de Churn", [
+                    ("T2.22", "Base de Datos: Vistas SQL calculando tickets P1 recurrentes por cliente.", "Base de Datos", 6, "Morales Quiroga, Josue David"),
+                    ("T2.23", "Web: Vista comercial en Angular con indicadores de semáforo de riesgo de cancelación.", "Frontend Web", 8, "Morales Quiroga, Josue David")
+                ]),
+                ("HU20", "Inspección de Adjuntos y Logs", [
+                    ("T2.24", "Backend: Endpoint seguro con URLs prefirmadas de S3 para descarga de adjuntos.", "Backend .NET", 6, "Monroy Gutiérrez, Henry Raul"),
+                    ("T2.25", "Web / Mobile: Visor modal de capturas y visor de trazas de logs de error.", "Frontend Mobile", 8, "Sánchez Peña, Eduardo Enrique")
                 ])
             ]
         },
@@ -408,29 +450,49 @@ def main():
             "goal": "Implementar automatizaciones de negocio (monitoreo de SLA, integración con Zoho CRM, algoritmo de priorización), Roadmap interactivo en Angular, alertas en tiempo real, pista de auditoría inmutable en MySQL y pulido final de la app móvil.",
             "dates": ("16/11/2026", "11/12/2026"),
             "items": [
+                ("HU21", "Notificaciones Reactivas en Vivo", [
+                    ("T3.01", "Backend: Hub de SignalR / WebSockets para emisión reactiva de cambios de estado.", "Backend .NET", 10, "Monroy Gutiérrez, Henry Raul"),
+                    ("T3.02", "Mobile / Web: Suscripción a eventos en vivo en React Native y Angular sin recarga manual.", "Fullstack / QA", 8, "Sánchez Peña, Eduardo Enrique")
+                ]),
                 ("HU22", "Integración Económica con Zoho CRM", [
-                    ("T3.1", "Base de Datos: Tabla 'crm_deals_impacto' para vincular contratos ($) a requerimientos de software.", "Base de Datos", 8, "Morales Quiroga, Josue David"),
-                    ("T3.2", "Backend: Endpoint Webhook para recepción de eventos de Zoho CRM y sincronización de valor comercial.", "Backend .NET", 12, "Monroy Gutiérrez, Henry Raul"),
-                    ("T3.3", "Web: Visualización del impacto económico monetario ($) en la lista de solicitudes de Angular.", "Frontend Web", 10, "Cahuana Ccallocunto, Aldair Santos"),
-                    ("T3.4", "QA: Simulación de webhooks entrantes y validación de actualización en base de datos.", "QA / Pruebas", 6, "Sánchez Peña, Eduardo Enrique")
+                    ("T3.03", "Base de Datos: Tabla 'crm_deals_impacto' para vincular contratos ($) a requerimientos.", "Base de Datos", 6, "Morales Quiroga, Josue David"),
+                    ("T3.04", "Backend: Endpoint Webhook con validación HMAC para sincronización de Zoho CRM.", "Backend .NET", 10, "Monroy Gutiérrez, Henry Raul"),
+                    ("T3.05", "Web: Visualización del impacto económico monetario ($) en la lista de solicitudes de Angular.", "Frontend Web", 8, "Cahuana Ccallocunto, Aldair Santos")
                 ]),
                 ("HU23", "Alertas Automáticas de SLA", [
-                    ("T3.5", "Base de Datos: Tablas 'sla_politicas' con tiempos límites de respuesta y resolución por severidad.", "Base de Datos", 6, "Morales Quiroga, Josue David"),
-                    ("T3.6", "Backend: Background Worker en .NET (Hosted Service) para monitoreo continuo de vencimiento de SLA.", "Backend .NET", 12, "Monroy Gutiérrez, Henry Raul"),
-                    ("T3.7", "Mobile: Pulido final de notificaciones reactivas y banners visuales de advertencia de SLA en móvil.", "Frontend Mobile", 10, "Cahuana Ccallocunto, Aldair Santos"),
-                    ("T3.8", "Fullstack: Pruebas de estrés y verificación del disparo de alertas preventivas antes del deadline.", "QA / Pruebas", 8, "Sánchez Peña, Eduardo Enrique")
+                    ("T3.06", "Base de Datos: Tablas 'sla_politicas' y 'sla_metricas' con límites contractuales por severidad.", "Base de Datos", 6, "Morales Quiroga, Josue David"),
+                    ("T3.07", "Backend: Background Worker en .NET (Hosted Service) para monitoreo continuo de SLA.", "Backend .NET", 10, "Monroy Gutiérrez, Henry Raul"),
+                    ("T3.08", "Mobile: Pulido final de notificaciones reactivas y banners visuales de advertencia en móvil.", "Frontend Mobile", 8, "Cahuana Ccallocunto, Aldair Santos")
                 ]),
-                ("HU25", "Roadmap Visual Interactivo", [
-                    ("T3.9", "Base de Datos: Tabla 'roadmap_items' con relaciones a feature requests y fechas estimadas de release.", "Base de Datos", 6, "Morales Quiroga, Josue David"),
-                    ("T3.10", "Backend: Endpoints de gestión de columnas Kanban (Evaluación, Desarrollo, Lanzamiento).", "Backend .NET", 8, "Monroy Gutiérrez, Henry Raul"),
-                    ("T3.11", "Web: Tablero Kanban interactivo con drag-and-drop en Angular para marketing y producto.", "Frontend Web", 14, "Cahuana Ccallocunto, Aldair Santos"),
-                    ("T3.12", "DevOps: Pruebas de renderizado y rendimiento en navegadores de escritorio y tablets.", "QA / Pruebas", 6, "Sánchez Peña, Eduardo Enrique")
+                ("HU24", "Algoritmo de Priorización Automática", [
+                    ("T3.09", "Backend: Servicio de cálculo de matriz Valor de Negocio vs Esfuerzo Técnico (RICE/WSJF).", "Backend .NET", 10, "Monroy Gutiérrez, Henry Raul"),
+                    ("T3.10", "Web: Vista de clasificación automática en Angular con ponderaciones de prioridad de release.", "Frontend Web", 8, "Morales Quiroga, Josue David")
+                ]),
+                ("HU25", "Roadmap Visual Interactivo (Kanban)", [
+                    ("T3.11", "Base de Datos: Tabla 'roadmap_items' con estados (Evaluación, Desarrollo, Lanzamiento).", "Base de Datos", 6, "Morales Quiroga, Josue David"),
+                    ("T3.12", "Web: Tablero Kanban interactivo con drag-and-drop en Angular para marketing y producto.", "Frontend Web", 12, "Cahuana Ccallocunto, Aldair Santos")
+                ]),
+                ("HU26", "Indicadores y Métricas de SLA", [
+                    ("T3.13", "Base de Datos: Vistas SQL de tiempo promedio de primera respuesta (MTTR) por cliente.", "Base de Datos", 8, "Morales Quiroga, Josue David"),
+                    ("T3.14", "Web: Gráficos de cumplimiento porcentual de SLA y métricas de resolución en Angular.", "Frontend Web", 10, "Morales Quiroga, Josue David")
+                ]),
+                ("HU27", "Ficha 360 del Cliente para Renovaciones", [
+                    ("T3.15", "Base de Datos: Consulta consolidada de historial de tickets, solicitudes y encuestas.", "Base de Datos", 6, "Morales Quiroga, Josue David"),
+                    ("T3.16", "Web: Pantalla de ficha 360 en Angular para preparación de reuniones comerciales.", "Frontend Web", 8, "Cahuana Ccallocunto, Aldair Santos")
+                ]),
+                ("HU28", "Avisos de Caídas y Mantenimientos", [
+                    ("T3.17", "Backend: Endpoints '/api/v1/announcements' para alertas urgentes de infraestructura.", "Backend .NET", 6, "Monroy Gutiérrez, Henry Raul"),
+                    ("T3.18", "Mobile & Web: Banners de advertencia urgentes desplegados en la cabecera de la app y web.", "Frontend Mobile", 8, "Cahuana Ccallocunto, Aldair Santos")
+                ]),
+                ("HU29", "Publicación de Changelogs", [
+                    ("T3.19", "Backend: Modelo y servicio de changelogs asociados a versiones del producto.", "Backend .NET", 6, "Monroy Gutiérrez, Henry Raul"),
+                    ("T3.20", "Web: Vista corporativa de historial de versiones y nuevas funcionalidades en Angular.", "Frontend Web", 6, "Morales Quiroga, Josue David")
                 ]),
                 ("HU30", "Pista de Auditoría Inmutable", [
-                    ("T3.13", "Base de Datos: Creación de triggers AFTER UPDATE y AFTER INSERT que pueblan 'auditoria_logs'.", "Base de Datos", 8, "Morales Quiroga, Josue David"),
-                    ("T3.14", "Backend: Middleware global de auditoría para registro de IP de cliente, timestamp UTC y payload JSON.", "Backend .NET", 10, "Monroy Gutiérrez, Henry Raul"),
-                    ("T3.15", "Web: Módulo de consulta de auditoría con visor de diferencias (diff) antes/después del registro.", "Frontend Web", 10, "Morales Quiroga, Josue David"),
-                    ("T3.16", "Cierre Scrum: Consolidación del Product Release Note y verificación final de cobertura técnica 100%.", "Fullstack / QA", 8, "Sánchez Peña, Eduardo Enrique")
+                    ("T3.21", "Base de Datos: Creación de triggers AFTER UPDATE y AFTER INSERT que pueblan 'auditoria_logs'.", "Base de Datos", 8, "Morales Quiroga, Josue David"),
+                    ("T3.22", "Backend: Middleware global de auditoría para registro de IP de cliente, timestamp y payload JSON.", "Backend .NET", 8, "Monroy Gutiérrez, Henry Raul"),
+                    ("T3.23", "Web: Módulo de consulta de auditoría con visor de diferencias (diff) antes/después.", "Frontend Web", 8, "Morales Quiroga, Josue David"),
+                    ("T3.24", "Cierre Scrum: Consolidación del Product Release Note y verificación final de cobertura 100%.", "Fullstack / QA", 8, "Sánchez Peña, Eduardo Enrique")
                 ])
             ]
         }
