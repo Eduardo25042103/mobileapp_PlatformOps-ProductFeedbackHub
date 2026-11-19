@@ -1,8 +1,11 @@
 import { registerRootComponent } from 'expo';
-
 import App from './App';
 
-// registerRootComponent calls AppRegistry.registerComponent('main', () => App);
-// It also ensures that whether you load the app in Expo Go or in a native build,
-// the environment is set up appropriately
+// Asegura que en entornos web el fondo del documento coincida con el modo oscuro
+if (typeof document !== 'undefined' && document.body) {
+  document.body.style.backgroundColor = '#0F172A';
+  document.body.style.margin = '0';
+  document.body.style.overflow = 'hidden';
+}
+
 registerRootComponent(App);

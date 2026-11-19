@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   View,
   Text,
@@ -10,6 +10,7 @@ import {
   Alert,
   TouchableWithoutFeedback,
   Keyboard,
+  ActivityIndicator,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useNavigation } from '@react-navigation/native';
@@ -18,34 +19,37 @@ import { useForm, Controller } from 'react-hook-form';
 import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { AuthStackParamList } from '../types/navigation';
-import { Department } from '../types/auth';
+import { CatalogDepartmentDto } from '../types/auth';
 import { useAuth } from '../context/AuthContext';
+import { authApi } from '../api/authApi';
 import { InputText } from '../components/InputText';
 import { Button } from '../components/Button';
-import { ArrowLeft, Code, Headset, LucideIcon, Megaphone, TrendingUp } from 'lucide-react-native';
+import { ArrowLeft, Building, Code, Headset, Megaphone, TrendingUp } from 'lucide-react-native';
 
-const registerSchema = z.object({
-  nombre: z.string().min(3, 'El nombre debe tener al menos 3 caracteres'),
-  email: z.string().email('Introduce un correo corporativo válido'),
-  password: z.string().min(6, 'La contraseña debe tener al menos 6 caracteres'),
-  departamento: z.enum(['SOPORTE', 'TI_DESARROLLO', 'VENTAS', 'MARKETING']),
-});
+const registerSchema = z
+  .object({
+    nombre: z.string().min(2, 'El nombre debe tener al menos 2 caracteres'),
+    apellido: z.string().min(2, 'El apellido debe tener al menos 2 caracteres'),
+    telefono: z.string().min(9, 'Ingresa un teléfono válido'),
+    email: z.string().email('Introduce un correo corporativo válido'),
+    password: z.string().min(6, 'La contraseña debe tener al menos 6 caracteres'),
+    confirmPassword: z.string().min(6, 'Confirma tu contraseña'),
+    departamentoId: z.number().min(1, 'Selecciona un departamento'),
+  })
+  .refine((data) => data.password === data.confirmPassword, {
+    message: 'Las contraseñas no coinciden',
+    path: ['confirmPassword'],
+  });
 
 type RegisterFormData = z.infer<typeof registerSchema>;
-
 type RegisterNavigationProp = NativeStackNavigationProp<AuthStackParamList, 'Register'>;
-
-const DEPARTMENTS: { id: Department; label: string; icon: LucideIcon; desc: string }[] = [
-  { id: 'TI_DESARROLLO', label: 'TI / Desarrollo', icon: Code, desc: 'Resolución de fallos y logs' },
-  { id: 'SOPORTE', label: 'Soporte Técnico', icon: Headset, desc: 'Recepción y escalación de tickets' },
-  { id: 'VENTAS', label: 'Ventas SaaS', icon: TrendingUp, desc: 'Canalización de pedidos y clientes' },
-  { id: 'MARKETING', label: 'Marketing / Prod', icon: Megaphone, desc: 'Changelogs y comunicados' },
-];
 
 export const RegisterScreen: React.FC = () => {
   const navigation = useNavigation<RegisterNavigationProp>();
   const { register: registerUser } = useAuth();
   const [loading, setLoading] = useState(false);
+  const [departments, setDepartments] = useState<CatalogDepartmentDto[]>([]);
+  const [loadingDeptos, setLoadingDeptos] = useState(true);
 
   const {
     control,
@@ -57,25 +61,67 @@ export const RegisterScreen: React.FC = () => {
     resolver: zodResolver(registerSchema),
     defaultValues: {
       nombre: '',
+      apellido: '',
+      telefono: '+51 987 654 321',
       email: '',
       password: '',
-      departamento: 'TI_DESARROLLO',
+      confirmPassword: '',
+      departamentoId: 2,
     },
   });
 
-  const selectedDept = watch('departamento');
+  const selectedDeptId = watch('departamentoId');
+
+  useEffect(() => {
+    const fetchDeptos = async () => {
+      try {
+        const list = await authApi.getDepartmentsCatalog();
+        setDepartments(list);
+      } finally {
+        setLoadingDeptos(false);
+      }
+    };
+    fetchDeptos();
+  }, []);
 
   const onSubmit = async (data: RegisterFormData) => {
     setLoading(true);
     try {
-      await registerUser(data);
+      await registerUser({
+        nombre: data.nombre,
+        apellido: data.apellido,
+        telefono: data.telefono,
+        email: data.email,
+        password: data.password,
+        departamento: String(data.departamentoId),
+        departamentoId: data.departamentoId,
+      });
+      Alert.alert(
+        '¡Registro Exitoso!',
+        'Tu cuenta ha sido creada exitosamente. Ya puedes ingresar a la plataforma.'
+      );
     } catch (err: any) {
       Alert.alert(
         'Error de Registro',
-        err.response?.data?.message || 'No fue posible completar el registro.'
+        err.response?.data?.message || err.message || 'No fue posible completar el registro.'
       );
     } finally {
       setLoading(false);
+    }
+  };
+
+  const getDeptIcon = (codigo: string) => {
+    switch (codigo) {
+      case 'TI':
+        return Code;
+      case 'SOP':
+        return Headset;
+      case 'VENTAS':
+        return TrendingUp;
+      case 'MKT':
+        return Megaphone;
+      default:
+        return Building;
     }
   };
 
@@ -92,39 +138,33 @@ export const RegisterScreen: React.FC = () => {
             showsVerticalScrollIndicator={false}
             keyboardShouldPersistTaps="handled"
           >
-            {/* Back to Login */}
+            {/* Back Button */}
             <TouchableOpacity
               style={styles.backButton}
-              onPress={() => {
-                if (navigation.canGoBack()) {
-                  navigation.goBack();
-                } else {
-                  navigation.navigate('Login');
-                }
-              }}
+              onPress={() => navigation.goBack()}
               activeOpacity={0.7}
             >
               <ArrowLeft size={16} color="#818CF8" />
-              <Text style={styles.backButtonText}>Volver al login</Text>
+              <Text style={styles.backButtonText}>Volver</Text>
             </TouchableOpacity>
 
             {/* Header */}
             <View style={styles.header}>
-              <Text style={styles.title}>Registro de Empleado</Text>
+              <Text style={styles.title}>Crear Cuenta</Text>
               <Text style={styles.subtitle}>
-                Crea tu perfil asignado para interactuar con el Hub de Operaciones
+                Completa tus datos para registrarte en la plataforma
               </Text>
             </View>
 
-            {/* Form */}
+            {/* Formulario */}
             <View style={styles.card}>
               <Controller
                 control={control}
                 name="nombre"
                 render={({ field: { onChange, onBlur, value } }) => (
                   <InputText
-                    label="Nombre Completo"
-                    placeholder="Ej. Carlos Mendoza"
+                    label="Nombres"
+                    placeholder="Ej. Carlos"
                     onBlur={onBlur}
                     onChangeText={onChange}
                     value={value}
@@ -135,12 +175,44 @@ export const RegisterScreen: React.FC = () => {
 
               <Controller
                 control={control}
+                name="apellido"
+                render={({ field: { onChange, onBlur, value } }) => (
+                  <InputText
+                    label="Apellidos"
+                    placeholder="Ej. Mendoza Quispe"
+                    onBlur={onBlur}
+                    onChangeText={onChange}
+                    value={value}
+                    error={errors.apellido?.message}
+                  />
+                )}
+              />
+
+              <Controller
+                control={control}
+                name="telefono"
+                render={({ field: { onChange, onBlur, value } }) => (
+                  <InputText
+                    label="Teléfono Móvil"
+                    placeholder="+51 987 654 321"
+                    keyboardType="phone-pad"
+                    onBlur={onBlur}
+                    onChangeText={onChange}
+                    value={value}
+                    error={errors.telefono?.message}
+                  />
+                )}
+              />
+
+              <Controller
+                control={control}
                 name="email"
                 render={({ field: { onChange, onBlur, value } }) => (
                   <InputText
                     label="Correo Corporativo"
-                    placeholder="carlos@empresa.com"
+                    placeholder="usuario@tunegocio.pe"
                     keyboardType="email-address"
+                    autoCapitalize="none"
                     onBlur={onBlur}
                     onChangeText={onChange}
                     value={value}
@@ -165,46 +237,63 @@ export const RegisterScreen: React.FC = () => {
                 )}
               />
 
+              <Controller
+                control={control}
+                name="confirmPassword"
+                render={({ field: { onChange, onBlur, value } }) => (
+                  <InputText
+                    label="Confirmar Contraseña"
+                    placeholder="Repite tu contraseña"
+                    isPassword
+                    onBlur={onBlur}
+                    onChangeText={onChange}
+                    value={value}
+                    error={errors.confirmPassword?.message}
+                  />
+                )}
+              />
+
               {/* Department Selector */}
-              <Text style={styles.sectionLabel}>DEPARTAMENTO ASIGNADO</Text>
-              <View style={styles.deptGrid}>
-                {DEPARTMENTS.map((dept) => {
-                  const isSelected = selectedDept === dept.id;
-                  return (
-                    <TouchableOpacity
-                      key={dept.id}
-                      activeOpacity={0.8}
-                      style={[styles.deptCard, isSelected && styles.deptCardSelected]}
-                      onPress={() => setValue('departamento', dept.id)}
-                    >
-                      <View style={styles.deptIcon}>
-                        <dept.icon color={isSelected ? '#818CF8' : '#94A3B8'} size={20} />
-                      </View>
-                      <Text
-                        style={[styles.deptName, isSelected && styles.deptNameSelected]}
+              <Text style={styles.sectionLabel}>DEPARTAMENTO</Text>
+              {loadingDeptos ? (
+                <ActivityIndicator size="small" color="#6366F1" style={{ marginVertical: 10 }} />
+              ) : (
+                <View style={styles.deptGrid}>
+                  {departments.map((dept) => {
+                    const isSelected = selectedDeptId === dept.id;
+                    const IconComponent = getDeptIcon(dept.codigo);
+                    return (
+                      <TouchableOpacity
+                        key={dept.id}
+                        activeOpacity={0.8}
+                        style={[styles.deptCard, isSelected && styles.deptCardSelected]}
+                        onPress={() => setValue('departamentoId', dept.id)}
                       >
-                        {dept.label}
-                      </Text>
-                      <Text style={styles.deptDesc}>{dept.desc}</Text>
-                    </TouchableOpacity>
-                  );
-                })}
-              </View>
+                        <View style={styles.deptIcon}>
+                          <IconComponent color={isSelected ? '#818CF8' : '#94A3B8'} size={18} />
+                        </View>
+                        <View style={{ flex: 1 }}>
+                          <Text style={[styles.deptName, isSelected && styles.deptNameSelected]}>
+                            {dept.nombre}
+                          </Text>
+                          {dept.descripcion ? (
+                            <Text style={styles.deptDesc} numberOfLines={2}>
+                              {dept.descripcion}
+                            </Text>
+                          ) : null}
+                        </View>
+                      </TouchableOpacity>
+                    );
+                  })}
+                </View>
+              )}
 
               <Button
-                title="Completar Registro"
+                title="Crear Cuenta"
                 onPress={handleSubmit(onSubmit)}
                 loading={loading}
-                style={{ marginTop: 20 }}
+                style={{ marginTop: 16 }}
               />
-            </View>
-
-            {/* Back to Login */}
-            <View style={styles.footer}>
-              <Text style={styles.footerText}>¿Ya tienes una cuenta interna? </Text>
-              <TouchableOpacity onPress={() => navigation.navigate('Login')}>
-                <Text style={styles.footerLink}>Iniciar Sesión</Text>
-              </TouchableOpacity>
             </View>
           </ScrollView>
         </TouchableWithoutFeedback>
@@ -219,41 +308,33 @@ const styles = StyleSheet.create({
     backgroundColor: '#0F172A',
   },
   container: {
-    flexGrow: 1,
-    padding: 24,
-    paddingTop: 16,
+    padding: 20,
     paddingBottom: 40,
   },
   backButton: {
-    alignSelf: 'flex-start',
     flexDirection: 'row',
     alignItems: 'center',
     gap: 6,
-    backgroundColor: '#1E293B',
-    paddingHorizontal: 12,
-    paddingVertical: 8,
-    borderRadius: 8,
-    borderWidth: 1,
-    borderColor: '#334155',
     marginBottom: 16,
   },
   backButtonText: {
     color: '#818CF8',
-    fontSize: 13,
+    fontSize: 14,
     fontWeight: '600',
   },
   header: {
     marginBottom: 20,
   },
   title: {
-    fontSize: 22,
+    fontSize: 20,
     fontWeight: '700',
     color: '#F8FAFC',
+    marginBottom: 6,
   },
   subtitle: {
     fontSize: 13,
     color: '#94A3B8',
-    marginTop: 4,
+    lineHeight: 18,
   },
   card: {
     backgroundColor: '#1E293B',
@@ -263,58 +344,50 @@ const styles = StyleSheet.create({
     borderColor: '#334155',
   },
   sectionLabel: {
+    color: '#94A3B8',
     fontSize: 11,
     fontWeight: '700',
-    color: '#94A3B8',
-    marginBottom: 10,
     letterSpacing: 0.5,
+    marginTop: 10,
+    marginBottom: 8,
   },
   deptGrid: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    gap: 10,
+    gap: 8,
+    marginBottom: 10,
   },
   deptCard: {
-    width: '48%',
-    backgroundColor: '#0F172A',
+    flexDirection: 'row',
+    alignItems: 'center',
+    padding: 10,
     borderRadius: 8,
+    backgroundColor: '#0F172A',
     borderWidth: 1,
     borderColor: '#334155',
-    padding: 12,
+    gap: 10,
   },
   deptCardSelected: {
     borderColor: '#6366F1',
     backgroundColor: 'rgba(99, 102, 241, 0.12)',
   },
   deptIcon: {
-    marginBottom: 6,
+    width: 32,
+    height: 32,
+    borderRadius: 16,
+    backgroundColor: '#1E293B',
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   deptName: {
+    color: '#F8FAFC',
     fontSize: 13,
     fontWeight: '600',
-    color: '#F8FAFC',
-    marginBottom: 2,
   },
   deptNameSelected: {
     color: '#818CF8',
   },
   deptDesc: {
-    fontSize: 10,
     color: '#64748B',
-    lineHeight: 14,
-  },
-  footer: {
-    flexDirection: 'row',
-    justifyContent: 'center',
-    marginVertical: 24,
-  },
-  footerText: {
-    color: '#94A3B8',
-    fontSize: 13,
-  },
-  footerLink: {
-    color: '#6366F1',
-    fontWeight: '600',
-    fontSize: 13,
+    fontSize: 11,
+    marginTop: 1,
   },
 });

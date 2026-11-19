@@ -11,6 +11,7 @@ interface AuthContextType {
   login: (credentials: LoginCredentials) => Promise<void>;
   register: (data: RegisterData) => Promise<void>;
   logout: () => Promise<void>;
+  refreshProfile: () => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -25,12 +26,27 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
       try {
         const savedToken = await storage.getToken();
         const savedUser = await storage.getUser();
-        if (savedToken && savedUser) {
+        if (savedToken) {
           setToken(savedToken);
-          setUser(savedUser);
+          if (savedUser) {
+            setUser(savedUser);
+          }
+          // Validar y refrescar sesión contra GET /auth/me en AWS
+          try {
+            const verified = await authApi.getCurrentUser();
+            setUser(verified);
+            await storage.saveUser(verified);
+          } catch (e: any) {
+            if (e.response?.status === 401) {
+              await storage.removeToken();
+              await storage.removeUser();
+              setToken(null);
+              setUser(null);
+            }
+          }
         }
       } catch (e) {
-        console.warn('Failed to restore session:', e);
+        console.warn('Fallo al restaurar sesión en móvil:', e);
       } finally {
         setIsLoading(false);
       }
@@ -77,6 +93,16 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     }
   };
 
+  const refreshProfile = async () => {
+    try {
+      const verified = await authApi.getCurrentUser();
+      setUser(verified);
+      await storage.saveUser(verified);
+    } catch {
+      // Ignorar si falla
+    }
+  };
+
   return (
     <AuthContext.Provider
       value={{
@@ -87,6 +113,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
         login,
         register,
         logout,
+        refreshProfile,
       }}
     >
       {children}

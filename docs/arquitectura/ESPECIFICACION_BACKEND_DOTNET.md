@@ -102,7 +102,7 @@ OpsHub.Backend/
 │   │
 │   └── OpsHub.Application/                 # Orquestación de Casos de Uso
 │       ├── Common/
-│       │   ├── Interfaces/                 # IApplicationDbContext, IS3StorageService, ICurrentUserService
+│       │   ├── Interfaces/                 # IApplicationDbContext, IS3StorageService, ICurrentUserService, ICognitoAuthService
 │       │   ├── Behaviors/                  # ValidationBehavior, LoggingBehavior
 │       │   ├── Models/                     # Result<T>, PaginatedList<T>
 │       │   └── Exceptions/                 # NotFoundException, UnauthorizedException, ValidationException
@@ -123,12 +123,13 @@ OpsHub.Backend/
 │   │   │   └── Interceptors/               # AuditLogsInterceptor (guarda en logs_actividad)
 │   │   ├── Services/
 │   │   │   ├── S3StorageService.cs         # Implementación AWS S3 Pre-signed URLs
-│   │   │   ├── PasswordHasher.cs           # BCrypt / Argon2
+│   │   │   ├── CognitoAuthService.cs       # Implementación AWS Cognito Identity Provider (Admin API)
+│   │   │   ├── PasswordHasher.cs           # BCrypt / Argon2 (respaldo local)
 │   │   │   └── JwtTokenGenerator.cs        # Generación y validación de Claims JWT
 │   │   └── DependencyInjection.cs
 │   │
 │   └── OpsHub.Api/                         # Punto de entrada Web & Lambda
-│       ├── Controllers/                    # Endpoints REST (Auth, Tickets, Feedback, Integrations)
+│       ├── Controllers/                    # Endpoints REST (Auth, Catalogs, Tickets, Feedback, Integrations, Users)
 │       ├── Middlewares/                    # ExceptionHandlingMiddleware (manejo centralizado 404, 409, 500)
 │       ├── Filters/                        # ZohoSignatureFilter
 │       ├── Program.cs                      # Configuración de servicios y AddAWSLambdaHosting
@@ -178,6 +179,60 @@ OpsHub.Backend/
 * La comunicación con herramientas comerciales se realiza a través del endpoint `POST /api/v1/integrations/zoho/webhook`.
 * La seguridad se valida mediante una firma criptográfica compartida en la cabecera `X-Zoho-Signature` (cálculo HMAC-SHA256 del payload recibido). Si la firma no coincide, la petición se rechaza con `HTTP 401 Unauthorized`.
 
+### 4.5. Autenticación Híbrida y Transacción Compensatoria (Saga Pattern) con AWS Cognito
+* **Problema:** En sistemas distribuidos donde la identidad se delega a un Identity Provider gestionado en la nube (AWS Cognito User Pool) y los datos operativos residen en una base de datos relacional (Amazon RDS MySQL), **no es posible utilizar una transacción ACID distribuida tradicional (2PC)**. Si el usuario se crea en Cognito pero el guardado en MySQL falla por timeout, caída de red o violación de integridad, el sistema quedaría en un estado inconsistente con un "usuario fantasma" o huérfano en Cognito.
+* **Solución Técnica (Compensating Transaction):**
+  1. **Pre-validación en MySQL:** Antes de contactar a Cognito, `AuthService.RegisterAsync` valida que el correo no esté duplicado y que el departamento y rol existan y estén activos. Si falla, jamás se invoca a Cognito.
+  2. **Aprovisionamiento en Cognito:** Se invoca `AdminCreateUserAsync` y `AdminSetUserPasswordAsync` con contraseña permanente (evitando el estado bloqueante `FORCE_CHANGE_PASSWORD`), recuperando el `cognito_sub` inmutable.
+  3. **Persistencia Transaccional en MySQL:** En un bloque `try`, se persiste el `UsuarioInterno` vinculando su `CognitoSub`.
+  4. **Compensación Inmediata (Rollback Distribuido):** Si `SaveChangesAsync` arroja cualquier excepción, el bloque `catch` ejecuta:
+     ```csharp
+     await _cognitoAuthService.DeleteUserAsync(request.Email, CancellationToken.None);
+     ```
+     Cognito ejecuta `AdminDeleteUserAsync` eliminando el registro de identidad creado milisegundos antes, garantizando consistencia eventual estricta sin registros huérfanos. Se utiliza `CancellationToken.None` para asegurar la finalización del borrado incluso si el cliente canceló su petición HTTP.
+  5. **Doble Factor de Respaldo:** El sistema almacena además un hash local seguro con BCrypt (`PasswordHash`), permitiendo que si AWS Cognito sufriera una degradación de servicio regional, los operadores puedan continuar autenticándose localmente sin interrupción operativa.
+
+### 4.6. Onboarding Seguro Multiplataforma y Prevención de Escalación de Privilegios (OWASP Top 1)
+* **Problema:** Permitir que usuarios anónimos envíen un `RolId` arbitrario en el formulario de registro de la Web o la App Móvil abre una brecha crítica de **Escalación de Privilegios (CWE-269 / Broken Access Control)**, donde un atacante podría autoasignarse el rol de `ADMIN`. Por otro lado, proteger los catálogos organizacionales detrás de autenticación impedía a la interfaz cliente poblar los combos desplegables para usuarios nuevos.
+* **Solución Técnica:**
+  1. **Catálogo Organizacional Público:** Se implementa `GET /api/v1/catalogs/departamentos` con `[AllowAnonymous]` en `CatalogsController`, permitiendo que la Web y la App Móvil consulten la estructura de la empresa de forma pública y sin requerir un token JWT previo.
+  2. **Desacoplamiento de Roles en Registro:** El modelo `RegisterRequest` define `RolId` como opcional (`int?`). El usuario que se auto-registra **solo elige su departamento**.
+  3. **Asignación de Rol Base en Servidor:** `AuthService` asigna automáticamente el rol base de menor privilegio correspondiente según el área:
+     * Departamento TI $\rightarrow$ Rol `Ingeniero de Software / TI` (`DEV_INGENIERO`).
+     * Departamento Ventas $\rightarrow$ Rol `Ejecutivo de Ventas` (`EJECUTIVO_VENTAS`).
+     * Departamento Marketing $\rightarrow$ Rol `Líder de Producto & Marketing` (`MARKETING_LEAD`).
+     * Otros Departamentos $\rightarrow$ Rol base `Agente de Soporte` (`AGENTE_SOPORTE`).
+  4. **Promoción Administrativa:** Los roles con permisos elevados (`ADMIN`) solo pueden ser otorgados posteriormente por un Administrador existente mediante los endpoints administrativos de `UsersController`.
+  5. **Endpoint de Identidad y Estado de Sesión (`GET /api/v1/auth/me`):**
+     * Permite que Angular y React Native resuelvan quién es el usuario conectado a partir de su token JWT sin exponer IDs en la URL (prevención de vulnerabilidades IDOR).
+     * Recupera la sesión automáticamente tras recargar la página (F5) o abrir la app móvil.
+     * Retorna la lista de permisos activos (`permisos: [...]`) para que el frontend configure dinámicamente qué botones y rutas habilitar mediante *Guards* y directivas estructurales.
+     * Si un usuario es revocado o desactivado en base de datos (`is_active = false`), `/me` corta el acceso inmediatamente aunque el token JWT del cliente no haya expirado.
+
+### 4.7. Blindaje de Control de Acceso Basado en Roles (RBAC) en `UsersController`
+* **Vulnerabilidad Prevenida (OWASP Broken Access Control):** En aplicaciones empresariales, un usuario autenticado con rol regular (ej. Desarrollador, Soporte o Ventas) no debe tener la facultad de mutar la estructura organizacional (crear departamentos, registrar colaboradores o alternar el estado activo de cuentas).
+* **Solución Técnica:**
+  * En `UsersController.cs`, los endpoints de mutación administrativa se decoraron con `[Authorize(Roles = "ADMIN")]`:
+    * `POST /api/v1/users`: Registro administrativo de nuevos usuarios internos con asignación de rol privilegiado.
+    * `PUT /api/v1/users/{id}/status`: Activación/desactivación de cuentas de colaboradores.
+    * `POST /api/v1/users/departments`: Creación de nuevos departamentos organizacionales.
+  * Se implementaron validaciones imperativas complementarias `User.IsInRole("ADMIN")` que emiten de inmediato `HTTP 403 Forbidden` (`ApiResponse<object>.Fail("No tiene privilegios para realizar esta acción.")`) en caso de accesos no autorizados.
+
+### 4.8. Telemetría Cloud en Vivo (`/health`) y Desglose de SLAs por Plan SaaS (`/operations`)
+* **Monitoreo Continuo de Infraestructura AWS (`GET /api/v1/health`):**
+  * El controlador `HealthController` realiza una prueba de conexión en caliente contra Amazon RDS MySQL 8.4 LTS mediante `_context.CanConnectAsync()`, midiendo los milisegundos reales de ida y vuelta con `System.Diagnostics.Stopwatch`.
+  * Expone la telemetría dinámica de los 6 componentes cloud legítimos que sustentan la solución en la región **`us-east-2 (Ohio)`**:
+    1. `rds-mysql`: Amazon RDS MySQL 8.4 Multi-AZ (Base de datos relacional con réplica y pool optimizado).
+    2. `lambda-api`: AWS Lambda .NET 10 (Microservicios serverless en runtime provided.al2023).
+    3. `api-gateway`: Amazon API Gateway v2 HTTP API (Enrutador serverless de baja latencia que balancea hacia Lambda).
+    4. `s3-storage`: Amazon S3 Storage (Depósito de evidencias y comprobantes con cifrado SSE-S3).
+    5. `cloudfront-cdn`: Amazon CloudFront CDN (Distribución global con compresión Brotli y Edge Locations).
+    6. `sse-eventstream`: Canal SSE EventStream en Tiempo Real (Transmisión reactiva de alertas).
+  * **Cero Métricas Simuladas:** Se erradicaron entradas artificiales de servicios externos ajenos a AWS (como SUNAT), garantizando total coherencia técnica entre la arquitectura física en la nube y el reporte de la API.
+* **Cálculo y Desglose Contractual de SLAs (`GET /api/v1/operations/metrics/sla`):**
+  * `OperationsService.GetSlaMetricsSummaryAsync` consulta las entidades `MetricaTicket`, `Ticket`, `ClienteSaas` y `PlanSuscripcion` en MySQL.
+  * Agrupa y calcula dinámicamente el cumplimiento porcentual y MTTR (Mean Time to Resolution) por cada nivel de suscripción (`ENTERPRISE` con SLA 4h, `PROFESSIONAL` con SLA 24h, `STARTER` con SLA 48h, `CUSTOM` con SLA 2h), entregando un objeto `List<PlanSlaBreakdownDto>` en el campo `DesglosePorPlan`.
+
 ---
 
 ## 5. Estrategia de Infraestructura y Seguridad en AWS
@@ -187,13 +242,19 @@ OpsHub.Backend/
 * El AWS SDK para .NET obtiene automáticamente credenciales temporales y rotativas desde el entorno de ejecución de Lambda.
 * Políticas mínimas asignadas al rol:
   * `s3:PutObject` y `s3:GetObject` únicamente en el bucket `opshub-adjuntos-*`.
+  * `cognito-idp:AdminCreateUser`, `cognito-idp:AdminSetUserPassword`, `cognito-idp:AdminInitiateAuth`, `cognito-idp:AdminDeleteUser`, `cognito-idp:AdminGetUser` acotados al User Pool `opshub-user-pool`.
   * `logs:CreateLogGroup`, `logs:CreateLogStream`, `logs:PutLogEvents` para CloudWatch.
 
 ### 5.2. Variables de Entorno en AWS Lambda
 Las credenciales propias de la aplicación se gestionan en **Lambda → Configuration → Environment variables** (cifradas en reposo con AWS KMS):
 * `ConnectionStrings__DefaultConnection`: Cadena de conexión hacia Amazon RDS MySQL.
 * `JwtSettings__SecretKey`: Llave simétrica de al menos 256 bits para firma de tokens JWT.
-* `AWS__BucketName`: Nombre del depósito privado de Amazon S3.
+* `JwtSettings__Issuer`: Identificador del emisor del token (`OpsHubApi`).
+* `JwtSettings__Audience`: Destinatarios autorizados del token (`OpsHubClients`).
+* `AWS__Cognito__UserPoolId`: ID del User Pool de AWS Cognito en la región (`us-east-2_5QCZKDuMi`).
+* `AWS__Cognito__ClientId`: ID de la aplicación cliente de Cognito sin secreto (`t4jlbvlo4pt244cnige95a5q0`).
+* `AWS__Cognito__Region`: Región de despliegue de Cognito (`us-east-2`).
+* `AWS__BucketName`: Nombre del depósito privado de Amazon S3 (`opshub-adjuntos-prod`).
 * `Zoho__WebhookSecret`: Clave secreta para validación de webhooks.
 
 ### 5.3. Prevención de Saturación de Conexiones a MySQL (Pool Tuning)
@@ -257,3 +318,12 @@ aws lambda update-function-code \
 
 #### 6. ¿Cómo auditan los cambios críticos en la base de datos para cumplimiento normativo?
 > *"Implementamos un interceptor automático en EF Core (`AuditLogsInterceptor`). Cada vez que se confirma una transacción (`SaveChangesAsync`), el interceptor inspecciona el ChangeTracker, identifica las entidades creadas, editadas o eliminadas, enmascara credenciales por seguridad y registra en la tabla `logs_actividad` el usuario, la IP, la plataforma y los estados en JSON (`valores_anteriores_json` y `valores_nuevos_json`), garantizando trazabilidad forense sin intervención manual en los controladores."*
+
+#### 7. ¿Cómo integraron AWS Cognito con MySQL y cómo aseguran consistencia si la base de datos falla al guardar?
+> *"Implementamos el patrón de Transacción Compensatoria (Saga Pattern). AWS Cognito y Amazon RDS MySQL son sistemas distribuidos independientes que no admiten una transacción ACID combinada. Al registrar un usuario, primero validamos en MySQL que los datos organizacionales sean correctos, luego creamos la identidad en Cognito recuperando el `cognito_sub`. Inmediatamente dentro de un bloque try guardamos en MySQL; si la base de datos falla por cualquier error, el bloque catch intercepta la excepción y llama a `AdminDeleteUserAsync` en Cognito con `CancellationToken.None`, destruyendo el usuario recién creado para garantizar cero registros huérfanos e inconsistencias."*
+
+#### 8. ¿Cómo diseñaron el registro en clientes evitando que un usuario se autoasigne privilegios de Administrador?
+> *"Para prevenir vulnerabilidades críticas de Escalación de Privilegios (OWASP Top 1 / Broken Access Control), el formulario de registro de la Web y App Móvil no permite que el usuario elija su rol. Expusimos un catálogo público `GET /api/v1/catalogs/departamentos` para que el colaborador solo elija su departamento organizacional, y el backend asigna automáticamente en el servidor el rol base correspondiente (ej. Agente de Soporte o Ingeniero de Software). Los roles de privilegio elevado como Administrador solo pueden ser concedidos posteriormente por otro administrador autenticado desde el módulo de gestión de usuarios."*
+
+#### 9. ¿Para qué sirve el endpoint `GET /api/v1/auth/me` y qué rol cumple en Angular y React Native?
+> *"El endpoint `/me` resuelve la identidad del usuario a partir del token JWT firmado en la cabecera Authorization sin enviar IDs en la URL, previniendo brechas de referencias directas a objetos (IDOR). En Angular y React Native cumple tres roles vitales: primero, restaurar la sesión del usuario al recargar la página (F5) o abrir la app móvil sin pedir contraseña; segundo, devolver la matriz de permisos RBAC para que el frontend active u oculte dinámicamente botones y vistas protegidas; y tercero, verificar en tiempo real que el usuario siga activo en la base de datos, revocando el acceso al instante si fue suspendido."*

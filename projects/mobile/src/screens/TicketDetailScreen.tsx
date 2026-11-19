@@ -349,44 +349,39 @@ export const TicketDetailScreen: React.FC = () => {
             </View>
 
             <Text style={styles.conflictTitle}>
-              Conflicto de Concurrencia (HTTP 409)
+              Incidencia Actualizada
             </Text>
 
             <Text style={styles.conflictBody}>
-              El bloqueo optimista del backend ha rechazado la actualización porque otro
-              usuario modificó este ticket simultáneamente.
+              Otro colaborador acaba de actualizar este ticket mientras lo editabas.
+              Recarga los datos para ver la información más reciente.
             </Text>
 
             <View style={styles.versionComparison}>
               <View style={styles.versionBox}>
-                <Text style={styles.versionBoxLabel}>TU PANTALLA</Text>
+                <Text style={styles.versionBoxLabel}>TU VERSIÓN</Text>
                 <Text style={[styles.versionBoxVal, { color: '#EF4444' }]}>
                   v{ticket.version}
                 </Text>
               </View>
               <ArrowRight size={18} color="#64748B" />
               <View style={styles.versionBox}>
-                <Text style={styles.versionBoxLabel}>SERVIDOR</Text>
+                <Text style={styles.versionBoxLabel}>ACTUAL</Text>
                 <Text style={[styles.versionBoxVal, { color: '#10B981' }]}>
                   v{conflictServerVersion}
                 </Text>
               </View>
             </View>
 
-            <Text style={styles.conflictHint}>
-              Debes recargar la información más reciente para no sobreescribir el trabajo
-              ajeno.
-            </Text>
-
             <Button
-              title="Recargar Datos del Servidor"
+              title="Recargar y Ver Cambios"
               icon={<RefreshCw size={15} color="#FFFFFF" />}
               onPress={async () => {
                 setShowConflictModal(false);
                 await refreshTickets();
                 fetchTicket();
               }}
-              style={{ width: '100%' }}
+              style={{ width: '100%', marginTop: 12 }}
             />
           </View>
         </View>

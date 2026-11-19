@@ -17,41 +17,63 @@ export type TicketCategory =
   | 'OTRO';
 
 export interface TicketAttachment {
-  id: string;
+  id: string | number;
   nombreArchivo: string;
   url: string;
   tamanoBytes: number;
   mimeType: string;
+  createdAt?: string;
 }
 
 export interface TicketComment {
-  id: string;
-  ticketId: string;
+  id: string | number;
+  ticketId?: string | number;
   autorNombre: string;
-  autorDepartamento: string;
+  autorDepartamento?: string;
   contenido: string;
+  esPrivadoTi?: boolean;
+  createdAt: string;
+}
+
+export interface TicketEscalation {
+  id: string | number;
+  escaladoPorNombre: string;
+  asignadoANombre: string;
+  motivoEscalacion: string;
+  diagnosticoInicial?: string;
   createdAt: string;
 }
 
 export interface Ticket {
   id: string;
+  numericId?: number;
   codigo: string;
   titulo: string;
   descripcion: string;
   logsError?: string;
+  clienteId?: number;
   clienteNombre: string;
+  clienteRuc?: string;
   clientePlan: string;
   telefono: string;
   categoria: TicketCategory;
+  categoriaNombre?: string;
   prioridad: TicketPriority;
+  prioridadNombre?: string;
   estado: TicketStatus;
+  estadoNombre?: string;
   version: number;
-  asignadoA?: string;
+  reportadoPorId?: number;
   reportadoPor: string;
+  asignadoAId?: number;
+  asignadoA?: string;
+  canalOrigen?: string;
   createdAt: string;
   updatedAt: string;
+  fechaCierre?: string;
   adjuntos: TicketAttachment[];
   comentarios: TicketComment[];
+  escalaciones?: TicketEscalation[];
 }
 
 export interface UpdateTicketInput {
@@ -67,11 +89,21 @@ export interface CreateTicketInput {
   descripcion: string;
   telefono: string;
   categoria: TicketCategory;
+  categoriaId?: number;
   prioridad: TicketPriority;
+  prioridadId?: number;
+  clienteId?: number;
   clienteNombre: string;
   clientePlan: string;
   adjuntoUrl?: string;
   adjuntoNombre?: string;
   adjuntoBytes?: number;
+  s3Key?: string;
 }
 
+export interface PresignedUrlResponse {
+  uploadUrl: string;
+  fileKey: string;
+  s3Key?: string;
+  expiresInMinutes?: number;
+}

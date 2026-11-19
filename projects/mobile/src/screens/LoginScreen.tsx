@@ -15,13 +15,14 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { useForm, Controller } from 'react-hook-form';
-import { Zap } from 'lucide-react-native';
+import { Radio, Zap, Shield, Code, Headset, TrendingUp, Megaphone } from 'lucide-react-native';
 import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { AuthStackParamList } from '../types/navigation';
 import { useAuth } from '../context/AuthContext';
 import { InputText } from '../components/InputText';
 import { Button } from '../components/Button';
+import { DEMO_USERS } from '../api/authApi';
 
 const loginSchema = z.object({
   email: z.string().email('Introduce un correo corporativo válido'),
@@ -29,13 +30,13 @@ const loginSchema = z.object({
 });
 
 type LoginFormData = z.infer<typeof loginSchema>;
-
 type LoginNavigationProp = NativeStackNavigationProp<AuthStackParamList, 'Login'>;
 
 export const LoginScreen: React.FC = () => {
   const navigation = useNavigation<LoginNavigationProp>();
   const { login } = useAuth();
   const [loading, setLoading] = useState(false);
+  const [showDemoAccounts, setShowDemoAccounts] = useState(false);
 
   const {
     control,
@@ -45,7 +46,7 @@ export const LoginScreen: React.FC = () => {
   } = useForm<LoginFormData>({
     resolver: zodResolver(loginSchema),
     defaultValues: {
-      email: 'alex.vance@telemetry-ops.internal',
+      email: 'aldair.cahuana@tunegocio.pe',
       password: 'password123',
     },
   });
@@ -57,11 +58,17 @@ export const LoginScreen: React.FC = () => {
     } catch (err: any) {
       Alert.alert(
         'Error de Autenticación',
-        err.response?.data?.message || 'Credenciales incorrectas o servidor no disponible.'
+        err.response?.data?.message || err.message || 'Credenciales incorrectas o servidor no disponible.'
       );
     } finally {
       setLoading(false);
     }
+  };
+
+  const selectDemoUser = (userKey: keyof typeof DEMO_USERS) => {
+    const demo = DEMO_USERS[userKey];
+    setValue('email', demo.email);
+    setValue('password', 'password123');
   };
 
   return (
@@ -80,19 +87,17 @@ export const LoginScreen: React.FC = () => {
             {/* Brand Header */}
             <View style={styles.header}>
               <View style={styles.logoBadge}>
-                <Zap color="#06B6D4" size={24} strokeWidth={2} />
+                <Radio color="#818CF8" size={26} />
               </View>
-              <Text style={styles.systemTitle}>Platform Ops Hub</Text>
-              <Text style={styles.systemSubtitle}>
-                SaaS Telemetry & Incident Management
-              </Text>
+              <Text style={styles.systemTitle}>PlatformOps Hub</Text>
+              <Text style={styles.systemSubtitle}>TuNegocio.pe • Portal de Operaciones</Text>
             </View>
 
-            {/* Form Card */}
+            {/* Login Card */}
             <View style={styles.card}>
-              <Text style={styles.cardTitle}>Iniciar Sesión Corporativa</Text>
+              <Text style={styles.cardTitle}>Iniciar Sesión</Text>
               <Text style={styles.cardSubtitle}>
-                Accede con las credenciales asignadas a tu cuenta interna.
+                Ingresa tus credenciales para acceder a la plataforma
               </Text>
 
               <Controller
@@ -101,8 +106,9 @@ export const LoginScreen: React.FC = () => {
                 render={({ field: { onChange, onBlur, value } }) => (
                   <InputText
                     label="Correo Corporativo"
-                    placeholder="usuario@empresa.com"
+                    placeholder="usuario@tunegocio.pe"
                     keyboardType="email-address"
+                    autoCapitalize="none"
                     onBlur={onBlur}
                     onChangeText={onChange}
                     value={value}
@@ -117,7 +123,7 @@ export const LoginScreen: React.FC = () => {
                 render={({ field: { onChange, onBlur, value } }) => (
                   <InputText
                     label="Contraseña"
-                    placeholder="••••••••••••"
+                    placeholder="••••••••"
                     isPassword
                     onBlur={onBlur}
                     onChangeText={onChange}
@@ -128,7 +134,7 @@ export const LoginScreen: React.FC = () => {
               />
 
               <Button
-                title="Ingresar a la Plataforma"
+                title="Iniciar Sesión"
                 onPress={handleSubmit(onSubmit)}
                 loading={loading}
                 style={{ marginTop: 8 }}
@@ -136,24 +142,65 @@ export const LoginScreen: React.FC = () => {
 
               {/* Demo Helper Button */}
               <TouchableOpacity
-                style={styles.quickFillButton}
-                onPress={() => {
-                  setValue('email', 'alex.vance@telemetry-ops.internal');
-                  setValue('password', 'password123');
-                }}
+                style={styles.toggleDemoBtn}
+                onPress={() => setShowDemoAccounts(!showDemoAccounts)}
+                activeOpacity={0.7}
               >
-                <View style={styles.quickFillContent}>
-                  <Zap color="#818CF8" size={14} />
-                  <Text style={styles.quickFillText}>
-                      Autocompletar cuenta demo (Alex Vance - TI)
-                  </Text>
-                </View>
+                <Zap color="#F59E0B" size={14} />
+                <Text style={styles.toggleDemoText}>
+                  {showDemoAccounts ? 'Ocultar cuentas de prueba' : 'Cuentas de prueba rápidas'}
+                </Text>
               </TouchableOpacity>
+
+              {/* Demo Accounts List */}
+              {showDemoAccounts && (
+                <View style={styles.demoAccountsBox}>
+                  <TouchableOpacity
+                    style={styles.demoItem}
+                    onPress={() => selectDemoUser('dev')}
+                  >
+                    <Code size={14} color="#818CF8" />
+                    <Text style={styles.demoText}>Aldair Cahuana (TI / Desarrollo)</Text>
+                  </TouchableOpacity>
+
+                  <TouchableOpacity
+                    style={styles.demoItem}
+                    onPress={() => selectDemoUser('soporte')}
+                  >
+                    <Headset size={14} color="#10B981" />
+                    <Text style={styles.demoText}>Henry Monroy (Soporte Técnico)</Text>
+                  </TouchableOpacity>
+
+                  <TouchableOpacity
+                    style={styles.demoItem}
+                    onPress={() => selectDemoUser('ventas')}
+                  >
+                    <TrendingUp size={14} color="#F59E0B" />
+                    <Text style={styles.demoText}>Josue Morales (Ventas Corporativas)</Text>
+                  </TouchableOpacity>
+
+                  <TouchableOpacity
+                    style={styles.demoItem}
+                    onPress={() => selectDemoUser('marketing')}
+                  >
+                    <Megaphone size={14} color="#EC4899" />
+                    <Text style={styles.demoText}>Eduardo Sánchez (Marketing & Producto)</Text>
+                  </TouchableOpacity>
+
+                  <TouchableOpacity
+                    style={styles.demoItem}
+                    onPress={() => selectDemoUser('admin')}
+                  >
+                    <Shield size={14} color="#EF4444" />
+                    <Text style={styles.demoText}>Administrador General</Text>
+                  </TouchableOpacity>
+                </View>
+              )}
             </View>
 
             {/* Register Link */}
             <View style={styles.footer}>
-              <Text style={styles.footerText}>¿Nuevo empleado en la organización? </Text>
+              <Text style={styles.footerText}>¿No tienes una cuenta? </Text>
               <TouchableOpacity onPress={() => navigation.navigate('Register')}>
                 <Text style={styles.footerLink}>Crear Cuenta</Text>
               </TouchableOpacity>
@@ -172,13 +219,12 @@ const styles = StyleSheet.create({
   },
   container: {
     flexGrow: 1,
-    padding: 24,
-    paddingBottom: 40,
+    padding: 20,
     justifyContent: 'center',
   },
   header: {
     alignItems: 'center',
-    marginBottom: 28,
+    marginBottom: 24,
   },
   logoBadge: {
     width: 52,
@@ -189,7 +235,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     borderWidth: 1,
     borderColor: '#334155',
-    marginBottom: 12,
+    marginBottom: 10,
   },
   systemTitle: {
     fontSize: 22,
@@ -198,11 +244,9 @@ const styles = StyleSheet.create({
     letterSpacing: -0.5,
   },
   systemSubtitle: {
-    fontSize: 11,
-    fontWeight: '600',
-    color: '#06B6D4',
-    textTransform: 'uppercase',
-    letterSpacing: 1,
+    fontSize: 12,
+    fontWeight: '500',
+    color: '#94A3B8',
     marginTop: 4,
   },
   card: {
@@ -221,30 +265,45 @@ const styles = StyleSheet.create({
   cardSubtitle: {
     fontSize: 13,
     color: '#94A3B8',
-    marginBottom: 20,
+    marginBottom: 16,
   },
-  quickFillButton: {
-    marginTop: 16,
-    paddingVertical: 10,
+  toggleDemoBtn: {
+    flexDirection: 'row',
     alignItems: 'center',
-    borderRadius: 6,
-    backgroundColor: 'rgba(99, 102, 241, 0.1)',
-    borderWidth: 1,
-    borderColor: 'rgba(99, 102, 241, 0.25)',
+    justifyContent: 'center',
+    gap: 6,
+    marginTop: 14,
+    paddingVertical: 8,
   },
-  quickFillText: {
-    color: '#818CF8',
+  toggleDemoText: {
+    color: '#F59E0B',
     fontSize: 12,
     fontWeight: '600',
   },
-  quickFillContent: {
-  flexDirection: 'row',
-  alignItems: 'center',
-  gap: 6,
+  demoAccountsBox: {
+    marginTop: 8,
+    padding: 10,
+    backgroundColor: '#0F172A',
+    borderRadius: 8,
+    gap: 6,
+  },
+  demoItem: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+    paddingVertical: 8,
+    paddingHorizontal: 10,
+    borderRadius: 6,
+    backgroundColor: '#1E293B',
+  },
+  demoText: {
+    color: '#E2E8F0',
+    fontSize: 12,
   },
   footer: {
     flexDirection: 'row',
     justifyContent: 'center',
+    alignItems: 'center',
     marginTop: 24,
   },
   footerText: {
@@ -252,8 +311,8 @@ const styles = StyleSheet.create({
     fontSize: 13,
   },
   footerLink: {
-    color: '#6366F1',
-    fontWeight: '600',
+    color: '#818CF8',
     fontSize: 13,
+    fontWeight: '700',
   },
 });

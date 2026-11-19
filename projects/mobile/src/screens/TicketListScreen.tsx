@@ -91,7 +91,13 @@ export const TicketListScreen: React.FC = () => {
         </View>
         <TouchableOpacity
           style={styles.backButton}
-          onPress={() => navigation.navigate('Home')}
+          onPress={() => {
+            if (navigation.canGoBack()) {
+              navigation.goBack();
+            } else {
+              navigation.navigate('Home');
+            }
+          }}
         >
           <ArrowLeft size={13} color="#818CF8" />
           <Text style={styles.backButtonText}>Inicio</Text>

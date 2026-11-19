@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   View,
   Text,
@@ -20,7 +20,9 @@ import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import * as ImagePicker from 'expo-image-picker';
 import { AppStackParamList } from '../types/navigation';
 import { TicketCategory, TicketPriority } from '../types/ticket';
+import { ClientSaas } from '../types/client';
 import { ticketsApi } from '../api/ticketsApi';
+import { clientsApi } from '../api/clientsApi';
 import { useTickets } from '../context/TicketContext';
 import { Button } from '../components/Button';
 import {
@@ -32,7 +34,6 @@ import {
   LucideIcon,
   Paperclip,
   PenTool,
-  Phone,
   Printer,
   Settings,
   Zap,
@@ -56,13 +57,6 @@ const PRIORITIES: { id: TicketPriority; label: string; color: string; desc: stri
   { id: 'P4', label: 'P4 BAJA', color: '#94A3B8', desc: 'Detalle cosmético' },
 ];
 
-const SAAS_CLIENTS = [
-  { nombre: 'Acme Logistics SaaS', plan: 'Plan Enterprise' },
-  { nombre: 'Fintech Solutions S.A.C.', plan: 'Plan Pro' },
-  { nombre: 'Grupo Comercial Andino', plan: 'Plan Enterprise' },
-  { nombre: 'Retail Fast Express', plan: 'Plan Básico' },
-];
-
 export const TicketFormScreen: React.FC = () => {
   const navigation = useNavigation<TicketFormNavProp>();
   const { createTicket } = useTickets();
@@ -71,15 +65,29 @@ export const TicketFormScreen: React.FC = () => {
   const [telefono, setTelefono] = useState('+51 987 654 321');
   const [categoria, setCategoria] = useState<TicketCategory>('AUTENTICACION');
   const [prioridad, setPrioridad] = useState<TicketPriority>('P1');
-  const [clienteIndex, setClienteIndex] = useState(0);
   const [descripcion, setDescripcion] = useState('');
 
-  // Estado multimedia (Amazon S3)
+  // Clientes SaaS dinámicos desde Amazon RDS
+  const [clients, setClients] = useState<ClientSaas[]>([]);
+  const [selectedClientIndex, setSelectedClientIndex] = useState(0);
+
+  // Multimedia (Amazon S3 Presigned URL)
   const [selectedImage, setSelectedImage] = useState<ImagePicker.ImagePickerAsset | null>(null);
   const [uploadingS3, setUploadingS3] = useState(false);
   const [submitting, setSubmitting] = useState(false);
 
-  // Selector de imagen con expo-image-picker
+  useEffect(() => {
+    const loadClients = async () => {
+      try {
+        const list = await clientsApi.getClients();
+        setClients(list);
+      } catch {
+        // Fallback predeterminado
+      }
+    };
+    loadClients();
+  }, []);
+
   const handlePickImage = async () => {
     try {
       const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
@@ -123,49 +131,56 @@ export const TicketFormScreen: React.FC = () => {
     let s3AttachmentUrl: string | undefined = undefined;
     let s3AttachmentName: string | undefined = undefined;
     let s3AttachmentSize: number | undefined = undefined;
+    let s3KeyCreated: string | undefined = undefined;
 
     try {
-      // Si el usuario seleccionó una imagen, realizamos el flujo de subida S3
+      // 1. Si seleccionó imagen, ejecutar flujo S3 con Presigned URL
       if (selectedImage) {
         setUploadingS3(true);
         const fileName = selectedImage.fileName || `screenshot_${Date.now()}.jpg`;
         const mimeType = selectedImage.mimeType || 'image/jpeg';
 
-        // 1. Pide URL prefirmada al backend
         const { uploadUrl, fileKey } = await ticketsApi.getPresignedUploadUrl(
           fileName,
           mimeType
         );
 
-        // 2. Sube el binario directamente a Amazon S3
         await ticketsApi.uploadFileToS3(uploadUrl, selectedImage.uri, mimeType);
 
         s3AttachmentUrl = selectedImage.uri;
         s3AttachmentName = fileName;
         s3AttachmentSize = selectedImage.fileSize || 180000;
+        s3KeyCreated = fileKey;
         setUploadingS3(false);
       }
 
-      // 3. Registra el ticket usando el contexto (useReducer)
-      const selectedClient = SAAS_CLIENTS[clienteIndex];
+      // 2. Registra el ticket en AWS
+      const currentClient = clients[selectedClientIndex] || {
+        id: 1,
+        nombreComercial: 'Acme Logistics SaaS',
+        planNombre: 'Plan Enterprise',
+      };
+
       const newTicket = await createTicket({
+        clienteId: currentClient.id,
         titulo: titulo.trim(),
         descripcion: descripcion.trim(),
         telefono: telefono.trim(),
         categoria,
         prioridad,
-        clienteNombre: selectedClient.nombre,
-        clientePlan: selectedClient.plan,
+        clienteNombre: currentClient.nombreComercial,
+        clientePlan: currentClient.planNombre,
         adjuntoUrl: s3AttachmentUrl,
         adjuntoNombre: s3AttachmentName,
         adjuntoBytes: s3AttachmentSize,
+        s3Key: s3KeyCreated,
       });
 
       Alert.alert(
         '¡Incidencia Creada con Éxito!',
-        `Se ha registrado el ticket ${newTicket.codigo} (versión v1) con prioridad ${newTicket.prioridad}.\n\n` +
-          (selectedImage ? '• Captura subida a Amazon S3 correctamente.\n' : '') +
-          '• Se ha notificado al equipo de TI en tiempo real vía SSE.',
+        `Se ha registrado la incidencia ${newTicket.codigo} con prioridad ${newTicket.prioridad}.\n\n` +
+          (selectedImage ? '• Captura adjunta guardada exitosamente.\n' : '') +
+          '• Se ha notificado al equipo de soporte para su atención.',
         [
           {
             text: 'Ver en Bandeja',
@@ -194,7 +209,7 @@ export const TicketFormScreen: React.FC = () => {
             style={styles.backButton}
             onPress={() => navigation.goBack()}
           >
-            <ArrowLeft size={13} color="#818CF8" />
+            <ArrowLeft size={16} color="#818CF8" />
             <Text style={styles.backButtonText}>Cancelar</Text>
           </TouchableOpacity>
           <Text style={styles.headerTitle}>Reportar Incidencia</Text>
@@ -207,173 +222,141 @@ export const TicketFormScreen: React.FC = () => {
             showsVerticalScrollIndicator={false}
             keyboardShouldPersistTaps="handled"
           >
-            {/* Título */}
-            <View style={styles.section}>
-              <Text style={styles.label}>TÍTULO DE LA INCIDENCIA</Text>
-              <TextInput
-                style={styles.textInput}
-                placeholder="Ej. Fallo en firma de comprobantes electrónicos..."
-                placeholderTextColor="#64748B"
-                value={titulo}
-                onChangeText={setTitulo}
-              />
-            </View>
+            {/* Título de la Incidencia */}
+            <Text style={styles.label}>TÍTULO DE LA INCIDENCIA</Text>
+            <TextInput
+              style={styles.input}
+              placeholder="Ej. Fallo 401 intermitente al firmar facturas"
+              placeholderTextColor="#64748B"
+              value={titulo}
+              onChangeText={setTitulo}
+            />
 
-            {/* Nivel de Prioridad */}
-            <View style={styles.section}>
-              <Text style={styles.label}>NIVEL DE PRIORIDAD</Text>
-              <View style={styles.priorityGrid}>
-                {PRIORITIES.map((p) => {
-                  const isSelected = prioridad === p.id;
-                  return (
-                    <TouchableOpacity
-                      key={p.id}
-                      style={[
-                        styles.priorityCard,
-                        { borderColor: isSelected ? p.color : '#334155' },
-                        isSelected && { backgroundColor: `${p.color}15` },
-                      ]}
-                      onPress={() => setPrioridad(p.id)}
-                    >
-                      <View style={[styles.priorityDot, { backgroundColor: p.color }]} />
-                      <Text style={[styles.priorityLabel, { color: isSelected ? p.color : '#F8FAFC' }]}>
-                        {p.label}
+            {/* Selector de Cliente */}
+            <Text style={styles.label}>EMPRESA / CLIENTE</Text>
+            <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.clientScroll}>
+              {clients.map((c, index) => {
+                const isSelected = selectedClientIndex === index;
+                return (
+                  <TouchableOpacity
+                    key={c.id}
+                    style={[styles.clientChip, isSelected && styles.clientChipSelected]}
+                    onPress={() => {
+                      setSelectedClientIndex(index);
+                      if (c.contactos?.[0]?.telefono) {
+                        setTelefono(c.contactos[0].telefono);
+                      }
+                    }}
+                  >
+                    <Building2 size={14} color={isSelected ? '#818CF8' : '#94A3B8'} />
+                    <View>
+                      <Text style={[styles.clientChipText, isSelected && styles.clientChipTextSelected]}>
+                        {c.nombreComercial}
                       </Text>
-                      <Text style={styles.priorityDesc}>{p.desc}</Text>
-                    </TouchableOpacity>
-                  );
-                })}
-              </View>
-            </View>
-
-            {/* Categoría Técnica */}
-            <View style={styles.section}>
-              <Text style={styles.label}>CATEGORÍA TÉCNICA</Text>
-              <View style={styles.chipsWrap}>
-                {CATEGORIES.map((c) => {
-                  const isSelected = categoria === c.id;
-                  const IconComp = c.icon;
-                  return (
-                    <TouchableOpacity
-                      key={c.id}
-                      style={[styles.categoryChip, isSelected && styles.categoryChipSelected]}
-                      onPress={() => setCategoria(c.id)}
-                    >
-                      <IconComp size={12} color={isSelected ? '#818CF8' : '#94A3B8'} />
-                      <Text style={[styles.categoryText, isSelected && styles.categoryTextSelected]}>
-                        {c.label}
-                      </Text>
-                    </TouchableOpacity>
-                  );
-                })}
-              </View>
-            </View>
-
-            {/* Cliente SaaS Afectado */}
-            <View style={styles.section}>
-              <Text style={styles.label}>CLIENTE SAAS AFECTADO</Text>
-              <View style={styles.clientsList}>
-                {SAAS_CLIENTS.map((client, idx) => {
-                  const isSelected = clienteIndex === idx;
-                  return (
-                    <TouchableOpacity
-                      key={client.nombre}
-                      style={[styles.clientCard, isSelected && styles.clientCardSelected]}
-                      onPress={() => setClienteIndex(idx)}
-                    >
-                      <View style={styles.clientNameRow}>
-                        <Building2 size={13} color={isSelected ? '#818CF8' : '#94A3B8'} />
-                        <Text style={[styles.clientName, isSelected && styles.clientNameSelected]}>
-                          {client.nombre}
-                        </Text>
-                      </View>
-                      <Text style={styles.clientPlan}>{client.plan}</Text>
-                    </TouchableOpacity>
-                  );
-                })}
-              </View>
-            </View>
+                      <Text style={styles.clientPlanSub}>{c.planNombre}</Text>
+                    </View>
+                  </TouchableOpacity>
+                );
+              })}
+            </ScrollView>
 
             {/* Teléfono de Contacto */}
-            <View style={styles.section}>
-              <View style={styles.labelRow}>
-                <Phone size={12} color="#94A3B8" />
-                <Text style={styles.label}>TELÉFONO DE CONTACTO</Text>
-              </View>
-              <TextInput
-                style={styles.textInput}
-                placeholder="Ej. +51 987 654 321"
-                placeholderTextColor="#64748B"
-                keyboardType="phone-pad"
-                value={telefono}
-                onChangeText={setTelefono}
-              />
-            </View>
+            <Text style={styles.label}>TELÉFONO DE CONTACTO</Text>
+            <TextInput
+              style={styles.input}
+              placeholder="+51 987 654 321"
+              placeholderTextColor="#64748B"
+              keyboardType="phone-pad"
+              value={telefono}
+              onChangeText={setTelefono}
+            />
 
-            {/* Descripción Técnica */}
-            <View style={styles.section}>
-              <Text style={styles.label}>DESCRIPCIÓN Y TRAZABILIDAD DEL ERROR</Text>
-              <TextInput
-                style={[styles.textInput, styles.textArea]}
-                placeholder="Describe el comportamiento erróneo, código de respuesta HTTP o logs relevantes..."
-                placeholderTextColor="#64748B"
-                multiline
-                numberOfLines={4}
-                value={descripcion}
-                onChangeText={setDescripcion}
-              />
-            </View>
-
-            {/* Subida Multimedia a Amazon S3 */}
-            <View style={styles.section}>
-              <Text style={styles.label}>CAPTURA DE PANTALLA (AMAZON S3)</Text>
-
-              {selectedImage ? (
-                <View style={styles.previewContainer}>
-                  <Image source={{ uri: selectedImage.uri }} style={styles.previewImage} />
-                  <View style={styles.previewMeta}>
-                    <View style={styles.previewNameRow}>
-                      <Paperclip size={13} color="#94A3B8" />
-                      <Text style={styles.previewName} numberOfLines={1}>
-                        {selectedImage.fileName || 'captura_error.jpg'}
-                      </Text>
-                    </View>
-                    <Text style={styles.previewSub}>
-                      {((selectedImage.fileSize || 180000) / 1024).toFixed(0)} KB • Listo para URL Prefirmada S3
+            {/* Nivel de Prioridad */}
+            <Text style={styles.label}>PRIORIDAD</Text>
+            <View style={styles.priorityGrid}>
+              {PRIORITIES.map((p) => {
+                const isSelected = prioridad === p.id;
+                return (
+                  <TouchableOpacity
+                    key={p.id}
+                    style={[
+                      styles.priorityCard,
+                      isSelected && { borderColor: p.color, backgroundColor: `${p.color}15` },
+                    ]}
+                    onPress={() => setPrioridad(p.id)}
+                  >
+                    <View style={[styles.priorityDot, { backgroundColor: p.color }]} />
+                    <Text style={[styles.priorityLabel, isSelected && { color: p.color }]}>
+                      {p.label}
                     </Text>
-                    <TouchableOpacity
-                      style={styles.removeImgBtn}
-                      onPress={() => setSelectedImage(null)}
-                    >
-                      <Text style={styles.removeImgText}>Eliminar imagen</Text>
-                    </TouchableOpacity>
-                  </View>
-                </View>
-              ) : (
-                <TouchableOpacity style={styles.uploadBox} onPress={handlePickImage}>
-                  <View style={styles.uploadIconContainer}>
-                    <Camera size={26} color="#6366F1" />
-                  </View>
-                  <Text style={styles.uploadTitle}>Adjuntar Captura desde la Galería</Text>
-                  <Text style={styles.uploadSubtitle}>
-                    Se subirá como binario directo a Amazon S3 (caducidad 5 min)
-                  </Text>
-                </TouchableOpacity>
-              )}
+                    <Text style={styles.priorityDesc}>{p.desc}</Text>
+                  </TouchableOpacity>
+                );
+              })}
             </View>
+
+            {/* Categoría */}
+            <Text style={styles.label}>CATEGORÍA TÉCNICA</Text>
+            <View style={styles.categoryGrid}>
+              {CATEGORIES.map((cat) => {
+                const isSelected = categoria === cat.id;
+                const Icon = cat.icon;
+                return (
+                  <TouchableOpacity
+                    key={cat.id}
+                    style={[styles.categoryCard, isSelected && styles.categoryCardSelected]}
+                    onPress={() => setCategoria(cat.id)}
+                  >
+                    <Icon size={16} color={isSelected ? '#818CF8' : '#94A3B8'} />
+                    <Text style={[styles.categoryText, isSelected && styles.categoryTextSelected]}>
+                      {cat.label}
+                    </Text>
+                  </TouchableOpacity>
+                );
+              })}
+            </View>
+
+            {/* Descripción y Traza */}
+            <Text style={styles.label}>DESCRIPCIÓN DEL FALLO Y LOGS</Text>
+            <TextInput
+              style={[styles.input, styles.textArea]}
+              placeholder="Detalla el escenario de reproducción, código HTTP y datos del pod..."
+              placeholderTextColor="#64748B"
+              multiline
+              numberOfLines={4}
+              value={descripcion}
+              onChangeText={setDescripcion}
+            />
+
+            {/* Evidencia Adjunta */}
+            <Text style={styles.label}>EVIDENCIA ADJUNTA (OPCIONAL)</Text>
+            {selectedImage ? (
+              <View style={styles.imagePreviewBox}>
+                <Image source={{ uri: selectedImage.uri }} style={styles.imagePreview} />
+                <TouchableOpacity
+                  style={styles.removeImageBtn}
+                  onPress={() => setSelectedImage(null)}
+                >
+                  <Text style={styles.removeImageText}>Cambiar Imagen</Text>
+                </TouchableOpacity>
+              </View>
+            ) : (
+              <TouchableOpacity style={styles.uploadBox} onPress={handlePickImage}>
+                <Camera size={24} color="#818CF8" />
+                <Text style={styles.uploadTitle}>Seleccionar de Galería o Cámara</Text>
+                <Text style={styles.uploadSub}>
+                  Adjunta una captura del error o pantalla (Máx 10 MB)
+                </Text>
+              </TouchableOpacity>
+            )}
 
             {/* Botón de Envío */}
-            <View style={{ marginTop: 8, marginBottom: 20 }}>
-              <Button
-                title={
-                  uploadingS3
-                    ? 'Subiendo captura a Amazon S3...'
-                    : 'Crear Incidencia y Notificar a TI'
-                }
-                onPress={handleSubmit}
-                loading={submitting || uploadingS3}
-              />
-            </View>
+            <Button
+              title={uploadingS3 ? 'Subiendo imagen...' : 'Registrar Incidencia'}
+              onPress={handleSubmit}
+              loading={submitting || uploadingS3}
+              style={{ marginTop: 24 }}
+            />
           </ScrollView>
         </TouchableWithoutFeedback>
       </KeyboardAvoidingView>
@@ -388,27 +371,21 @@ const styles = StyleSheet.create({
   },
   header: {
     flexDirection: 'row',
-    justifyContent: 'space-between',
     alignItems: 'center',
-    paddingHorizontal: 20,
-    paddingVertical: 14,
+    justifyContent: 'space-between',
+    paddingHorizontal: 16,
+    paddingVertical: 12,
     borderBottomWidth: 1,
-    borderBottomColor: '#1E293B',
+    borderBottomColor: '#334155',
   },
   backButton: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 5,
-    paddingHorizontal: 10,
-    paddingVertical: 6,
-    borderRadius: 6,
-    backgroundColor: '#1E293B',
-    borderWidth: 1,
-    borderColor: '#334155',
+    gap: 4,
   },
   backButtonText: {
     color: '#818CF8',
-    fontSize: 12,
+    fontSize: 14,
     fontWeight: '600',
   },
   headerTitle: {
@@ -417,38 +394,62 @@ const styles = StyleSheet.create({
     fontWeight: '700',
   },
   container: {
-    padding: 20,
+    padding: 16,
     paddingBottom: 40,
   },
-  section: {
-    marginBottom: 20,
-  },
   label: {
+    color: '#94A3B8',
     fontSize: 11,
     fontWeight: '700',
-    color: '#94A3B8',
-    marginBottom: 8,
     letterSpacing: 0.5,
-  },
-  labelRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 6,
+    marginTop: 14,
     marginBottom: 8,
   },
-  textInput: {
+  input: {
     backgroundColor: '#1E293B',
     borderRadius: 8,
     borderWidth: 1,
     borderColor: '#334155',
+    color: '#F8FAFC',
     paddingHorizontal: 12,
     paddingVertical: 10,
-    color: '#F8FAFC',
     fontSize: 14,
   },
   textArea: {
     minHeight: 90,
     textAlignVertical: 'top',
+  },
+  clientScroll: {
+    flexDirection: 'row',
+    marginBottom: 4,
+  },
+  clientChip: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+    backgroundColor: '#1E293B',
+    borderWidth: 1,
+    borderColor: '#334155',
+    borderRadius: 8,
+    paddingHorizontal: 12,
+    paddingVertical: 8,
+    marginRight: 8,
+  },
+  clientChipSelected: {
+    borderColor: '#6366F1',
+    backgroundColor: 'rgba(99, 102, 241, 0.15)',
+  },
+  clientChipText: {
+    color: '#E2E8F0',
+    fontSize: 12,
+    fontWeight: '600',
+  },
+  clientChipTextSelected: {
+    color: '#818CF8',
+  },
+  clientPlanSub: {
+    color: '#64748B',
+    fontSize: 10,
   },
   priorityGrid: {
     flexDirection: 'row',
@@ -458,9 +459,9 @@ const styles = StyleSheet.create({
   priorityCard: {
     width: '48%',
     backgroundColor: '#1E293B',
-    borderRadius: 8,
     borderWidth: 1,
     borderColor: '#334155',
+    borderRadius: 8,
     padding: 10,
   },
   priorityDot: {
@@ -470,143 +471,85 @@ const styles = StyleSheet.create({
     marginBottom: 4,
   },
   priorityLabel: {
+    color: '#F8FAFC',
     fontSize: 12,
     fontWeight: '700',
-    marginBottom: 2,
   },
   priorityDesc: {
-    fontSize: 10,
     color: '#64748B',
+    fontSize: 10,
+    marginTop: 2,
   },
-  chipsWrap: {
+  categoryGrid: {
     flexDirection: 'row',
     flexWrap: 'wrap',
     gap: 8,
   },
-  categoryChip: {
+  categoryCard: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: 6,
     backgroundColor: '#1E293B',
-    borderRadius: 6,
     borderWidth: 1,
     borderColor: '#334155',
+    borderRadius: 8,
     paddingHorizontal: 10,
-    paddingVertical: 7,
+    paddingVertical: 8,
   },
-  categoryChipSelected: {
+  categoryCardSelected: {
     borderColor: '#6366F1',
-    backgroundColor: 'rgba(99, 102, 241, 0.2)',
+    backgroundColor: 'rgba(99, 102, 241, 0.15)',
   },
   categoryText: {
-    color: '#94A3B8',
+    color: '#CBD5E1',
     fontSize: 12,
-    fontWeight: '500',
   },
   categoryTextSelected: {
     color: '#818CF8',
-    fontWeight: '600',
-  },
-  clientsList: {
-    gap: 8,
-  },
-  clientCard: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    backgroundColor: '#1E293B',
-    borderRadius: 8,
-    borderWidth: 1,
-    borderColor: '#334155',
-    padding: 12,
-  },
-  clientCardSelected: {
-    borderColor: '#6366F1',
-    backgroundColor: 'rgba(99, 102, 241, 0.1)',
-  },
-  clientNameRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 7,
-  },
-  clientName: {
-    color: '#CBD5E1',
-    fontSize: 13,
-    fontWeight: '500',
-  },
-  clientNameSelected: {
-    color: '#F8FAFC',
     fontWeight: '700',
-  },
-  clientPlan: {
-    color: '#06B6D4',
-    fontSize: 11,
-    fontWeight: '600',
   },
   uploadBox: {
     backgroundColor: '#1E293B',
-    borderRadius: 8,
     borderWidth: 1,
     borderStyle: 'dashed',
-    borderColor: '#334155',
+    borderColor: '#6366F1',
+    borderRadius: 10,
     padding: 20,
     alignItems: 'center',
     justifyContent: 'center',
-  },
-  uploadIconContainer: {
-    marginBottom: 8,
+    gap: 6,
   },
   uploadTitle: {
     color: '#F8FAFC',
     fontSize: 13,
     fontWeight: '600',
-    marginBottom: 4,
   },
-  uploadSubtitle: {
+  uploadSub: {
     color: '#64748B',
     fontSize: 11,
     textAlign: 'center',
   },
-  previewContainer: {
-    flexDirection: 'row',
+  imagePreviewBox: {
+    alignItems: 'center',
     backgroundColor: '#1E293B',
-    borderRadius: 8,
+    borderRadius: 10,
+    padding: 12,
     borderWidth: 1,
     borderColor: '#334155',
-    padding: 10,
-    alignItems: 'center',
-    gap: 12,
   },
-  previewImage: {
-    width: 64,
-    height: 64,
-    borderRadius: 6,
-    backgroundColor: '#0F172A',
+  imagePreview: {
+    width: '100%',
+    height: 180,
+    borderRadius: 8,
+    resizeMode: 'cover',
   },
-  previewMeta: {
-    flex: 1,
+  removeImageBtn: {
+    marginTop: 10,
+    paddingVertical: 4,
   },
-  previewNameRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 6,
-  },
-  previewName: {
-    color: '#F8FAFC',
-    fontSize: 12,
-    fontWeight: '600',
-  },
-  previewSub: {
-    color: '#10B981',
-    fontSize: 10,
-    marginTop: 2,
-  },
-  removeImgBtn: {
-    marginTop: 6,
-  },
-  removeImgText: {
+  removeImageText: {
     color: '#EF4444',
-    fontSize: 11,
+    fontSize: 12,
     fontWeight: '600',
   },
 });

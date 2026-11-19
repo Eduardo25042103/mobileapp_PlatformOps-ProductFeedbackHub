@@ -3,6 +3,7 @@ import React, {
   useContext,
   useReducer,
   useEffect,
+  useRef,
   ReactNode,
 } from 'react';
 import {
@@ -13,17 +14,20 @@ import {
 import { ticketsApi } from '../api/ticketsApi';
 
 // ============================================================================
-// 1. Tipos de Estado y Acciones para el Reducer (Lógica CRUD en Memoria)
+// 1. Tipos de Estado y Acciones para el Reducer (CRUD + Tiempo Real)
 // ============================================================================
 interface TicketState {
   tickets: Ticket[];
   loading: boolean;
+  refreshing: boolean;
   error: string | null;
+  lastUpdated: string;
 }
 
 type TicketAction =
   | { type: 'LOAD_START' }
   | { type: 'LOAD_SUCCESS'; payload: Ticket[] }
+  | { type: 'SILENT_SYNC'; payload: Ticket[] }
   | { type: 'LOAD_ERROR'; payload: string }
   | { type: 'ADD_TICKET'; payload: Ticket }
   | { type: 'UPDATE_TICKET'; payload: Ticket }
@@ -32,27 +36,40 @@ type TicketAction =
 const initialState: TicketState = {
   tickets: [],
   loading: true,
+  refreshing: false,
   error: null,
+  lastUpdated: new Date().toLocaleTimeString(),
 };
 
-// ============================================================================
-// 2. Reducer para manejar las transiciones de estado del CRUD
-// ============================================================================
 function ticketReducer(state: TicketState, action: TicketAction): TicketState {
   switch (action.type) {
     case 'LOAD_START':
-      return { ...state, loading: true, error: null };
+      return { ...state, loading: state.tickets.length === 0, refreshing: true, error: null };
 
     case 'LOAD_SUCCESS':
-      return { ...state, loading: false, tickets: action.payload };
+      return {
+        ...state,
+        loading: false,
+        refreshing: false,
+        tickets: action.payload,
+        lastUpdated: new Date().toLocaleTimeString(),
+      };
+
+    case 'SILENT_SYNC':
+      return {
+        ...state,
+        tickets: action.payload,
+        lastUpdated: new Date().toLocaleTimeString(),
+      };
 
     case 'LOAD_ERROR':
-      return { ...state, loading: false, error: action.payload };
+      return { ...state, loading: false, refreshing: false, error: action.payload };
 
     case 'ADD_TICKET':
       return {
         ...state,
         tickets: [action.payload, ...state.tickets],
+        lastUpdated: new Date().toLocaleTimeString(),
       };
 
     case 'UPDATE_TICKET':
@@ -61,12 +78,14 @@ function ticketReducer(state: TicketState, action: TicketAction): TicketState {
         tickets: state.tickets.map((t) =>
           t.id === action.payload.id ? action.payload : t
         ),
+        lastUpdated: new Date().toLocaleTimeString(),
       };
 
     case 'DELETE_TICKET':
       return {
         ...state,
         tickets: state.tickets.filter((t) => t.id !== action.payload),
+        lastUpdated: new Date().toLocaleTimeString(),
       };
 
     default:
@@ -75,12 +94,14 @@ function ticketReducer(state: TicketState, action: TicketAction): TicketState {
 }
 
 // ============================================================================
-// 3. Contrato del Context API
+// 2. Contrato del Context API
 // ============================================================================
 interface TicketContextType {
   tickets: Ticket[];
   loading: boolean;
+  refreshing: boolean;
   error: string | null;
+  lastUpdated: string;
   refreshTickets: () => Promise<void>;
   getTicketById: (id: string) => Ticket | undefined;
   createTicket: (input: CreateTicketInput) => Promise<Ticket>;
@@ -92,42 +113,52 @@ interface TicketContextType {
 const TicketContext = createContext<TicketContextType | undefined>(undefined);
 
 // ============================================================================
-// 4. Provider de Incidencias con useReducer + Context API
+// 3. Provider de Incidencias con Polling Reactivo en Tiempo Real
 // ============================================================================
 export const TicketProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
   const [state, dispatch] = useReducer(ticketReducer, initialState);
+  const pollingRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
-  const fetchTickets = async () => {
-    dispatch({ type: 'LOAD_START' });
+  const fetchTickets = async (isManual = false) => {
+    if (isManual) {
+      dispatch({ type: 'LOAD_START' });
+    }
     try {
       const data = await ticketsApi.getTickets();
-      dispatch({ type: 'LOAD_SUCCESS', payload: data });
+      if (isManual || state.tickets.length === 0) {
+        dispatch({ type: 'LOAD_SUCCESS', payload: data });
+      } else {
+        dispatch({ type: 'SILENT_SYNC', payload: data });
+      }
     } catch (err: any) {
-      dispatch({
-        type: 'LOAD_ERROR',
-        payload: err.message || 'Error al cargar tickets',
-      });
+      if (isManual) {
+        dispatch({
+          type: 'LOAD_ERROR',
+          payload: err.message || 'Error al conectar con AWS',
+        });
+      }
     }
   };
 
   useEffect(() => {
-    fetchTickets();
+    fetchTickets(true);
+
+    // Live Reactive Polling: Sincroniza cada 25 segundos con AWS Lambda & RDS MySQL
+    pollingRef.current = setInterval(() => {
+      fetchTickets(false);
+    }, 25000);
+
+    return () => {
+      if (pollingRef.current) clearInterval(pollingRef.current);
+    };
   }, []);
 
   const refreshTickets = async () => {
-    try {
-      const data = await ticketsApi.getTickets();
-      dispatch({ type: 'LOAD_SUCCESS', payload: data });
-    } catch (err: any) {
-      dispatch({
-        type: 'LOAD_ERROR',
-        payload: err.message || 'Error al refrescar tickets',
-      });
-    }
+    await fetchTickets(true);
   };
 
   const getTicketById = (id: string) => {
-    return state.tickets.find((t) => t.id === id);
+    return state.tickets.find((t) => t.id === id || String(t.numericId) === id);
   };
 
   const createTicket = async (input: CreateTicketInput): Promise<Ticket> => {
@@ -164,7 +195,9 @@ export const TicketProvider: React.FC<{ children: ReactNode }> = ({ children }) 
       value={{
         tickets: state.tickets,
         loading: state.loading,
+        refreshing: state.refreshing,
         error: state.error,
+        lastUpdated: state.lastUpdated,
         refreshTickets,
         getTicketById,
         createTicket,

@@ -13,6 +13,7 @@ export const AuthNavigator: React.FC = () => {
       screenOptions={{
         headerShown: false,
         contentStyle: { backgroundColor: '#0F172A' },
+        animation: 'slide_from_right',
       }}
     >
       <Stack.Screen name="Login" component={LoginScreen} />

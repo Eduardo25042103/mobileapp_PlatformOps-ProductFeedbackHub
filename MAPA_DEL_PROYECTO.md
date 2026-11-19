@@ -14,6 +14,8 @@ Este documento sirve como **índice maestro y mapa de acceso directo** a todos l
 ```text
 proyecto-sexto-ciclo/
 ├── projects/                  # Código fuente de las aplicaciones y software ejecutable
+│   ├── backend/               # Web API .NET Core 10 (Clean Architecture, AWS Lambda, RDS MySQL)
+│   ├── web/                   # Portal Web Corporativo (Angular 21, Tailwind, AWS S3 + CloudFront)
 │   └── mobile/                # Aplicación Móvil (React Native + Expo SDK 58 + Web)
 ├── docs/                      # Documentación centralizada del proyecto
 │   ├── arquitectura/          # Especificaciones técnicas, BD MySQL, Backend .NET y diagramas
@@ -37,10 +39,14 @@ Carpeta que contiene todas las especificaciones de diseño técnico, contratos d
 |---|:---:|---|
 | [**`ESPECIFICACION_ARQUITECTURA.md`**](docs/arquitectura/ESPECIFICACION_ARQUITECTURA.md) | Markdown | **Documento Maestro de Arquitectura.** Detalla los objetivos generales y específicos, arquitectura serverless en AWS, flujo multiplataforma, bloqueo optimista (`version` / HTTP 409), integración con Zoho CRM y las 30 tablas. |
 | [**`ESPECIFICACION_BACKEND_DOTNET.md`**](docs/arquitectura/ESPECIFICACION_BACKEND_DOTNET.md) | Markdown | **Arquitectura de Backend .NET Core 10.** Implementación bajo Clean Architecture (Domain, Application, Infrastructure, Api) aplicando principios SOLID, CQRS, AWS Lambda, API Gateway y Pomelo MySQL. |
+| [**`ESPECIFICACION_FRONTEND_ANGULAR.md`**](docs/arquitectura/ESPECIFICACION_FRONTEND_ANGULAR.md) | Markdown | **Especificación de Frontend Web Angular 21.** Arquitectura basada en Standalone Components, Signals, tokens Obsidian Telemetry, manejo de concurrencia 409 y módulos Kanban/SLA/Ficha 360°. |
+| [**`ESPECIFICACION_MOBILE_REACT_NATIVE.md`**](docs/arquitectura/ESPECIFICACION_MOBILE_REACT_NATIVE.md) | Markdown | **Especificación de Aplicación Móvil React Native & Expo SDK 58.** Arquitectura táctil, Live Polling reactivo (25s), Bloqueo Optimista (HTTP 409), captura multimedia a Amazon S3 y alineación con el Portal Web. |
 | [**`ESPECIFICACION_BASE_DATOS_OPSHUB.md`**](docs/arquitectura/ESPECIFICACION_BASE_DATOS_OPSHUB.md) | Markdown | **Especificación de Base de Datos MySQL 8.4.** Diccionario exhaustivo de las 30 tablas en 6 módulos, restricciones, normalización 1FN-3FN, índices, collation `utf8mb4_unicode_ci` y triggers. |
 | [**`schema_opshub_db.sql`**](docs/arquitectura/schema_opshub_db.sql) | SQL Script | Script DDL completo y ejecutable para crear la base de datos `opshub_db` con sus 30 tablas en MySQL 8.4 / Amazon RDS. |
 | [**`opshub_db.png`**](docs/arquitectura/opshub_db.png) | Imagen | Diagrama de Entidad-Relación visual de la base de datos completa. |
 | [**`ROADMAP_BITACORA_BACKEND.md`**](docs/arquitectura/ROADMAP_BITACORA_BACKEND.md) | Markdown | Plan de trabajo y bitácora de desarrollo de los servicios del backend. |
+| [**`ROADMAP_BITACORA_FRONTEND.md`**](docs/arquitectura/ROADMAP_BITACORA_FRONTEND.md) | Markdown | Plan de trabajo escalonado, checklist de fases y bitácora de desarrollo del portal web en Angular. |
+| [**`ROADMAP_BITACORA_MOBILE.md`**](docs/arquitectura/ROADMAP_BITACORA_MOBILE.md) | Markdown | Plan de trabajo escalonado, checklist de fases, bitácora de desarrollo e instrucciones de verificación manual de la app móvil. |
 | [**`arqui.drawio`**](docs/arquitectura/arqui.drawio) | Draw.io | Diagrama editable de la arquitectura de nube y flujo de componentes. |
 | [**`flujo.drawio`**](docs/arquitectura/flujo.drawio) | Draw.io | Diagrama editable de los flujos de escalación y procesos del sistema. |
 
@@ -102,14 +108,71 @@ projects/mobile/
 
 ---
 
-### 5. 🎨 Diseños y Prototipado (`design/`)
+### 5. 💻 Portal Web Corporativo Angular 21 (`projects/web/`)
+
+Consola central de operaciones y feedback de producto en **Angular 21** (Standalone Components, Signals, New Control Flow) con diseño Obsidian Telemetry (Tailwind CSS):
+
+```text
+projects/web/
+├── src/
+│   ├── app/
+│   │   ├── core/                  # AuthService, TicketService, ClientService, FeedbackService, OperationsService
+│   │   ├── shared/                # Card, Button, InputText, PriorityBadge, StatusBadge, ConflictDialog
+│   │   └── features/
+│   │       ├── auth/                  # Login corporativo y Registro público de colaboradores (AWS Cognito)
+│   │       ├── dashboard          # KPIs consolidados, gráficos analíticos y salud de AWS
+│   │       ├── tickets/           # Bandeja Datadog, nuevo ticket (S3) y detalle 360° con escalación
+│   │       ├── clients/           # Directorio SaaS, semáforo Churn y ficha integral 360°
+│   │       ├── feedback/          # Tablero Kanban Drag & Drop y Matriz RICE con impacto ARR ($)
+│   │       ├── announcements/     # Alertas de infraestructura y Changelog de versiones
+│   │       ├── operations/        # Métricas de SLA y visor inmutable de logs de auditoría
+│   │       └── admin/             # Aprovisionamiento de usuarios, departamentos y matriz RBAC
+│   ├── environments/              # environment.ts (local) y environment.prod.ts (AWS)
+│   └── styles.css                 # Obsidian Telemetry Design Tokens
+├── aws-frontend-template.yaml     # Infraestructura CloudFormation (S3 + OAC + CloudFront CDN)
+├── deploy-web-s3.ps1              # Script de compilación y despliegue automatizado en AWS
+└── package.json                   # Angular 21, Tailwind CSS, Angular CDK y Lucide Icons
+```
+
+#### Comandos Rápidos de Ejecución:
+* **Portal Web en Producción (CloudFront CDN):** [https://d77t0uv3b5km5.cloudfront.net](https://d77t0uv3b5km5.cloudfront.net)
+* **Backend API en Producción (API Gateway v2):** `https://193b69gfya.execute-api.us-east-2.amazonaws.com/api/v1`
+* **Iniciar Servidor de Desarrollo:** `cd projects/web` ➔ `npm start` (abre en `http://localhost:4200`, conectado al backend en la nube)
+* **Compilar para Producción:** `cd projects/web` ➔ `npm run build`
+* **Desplegar en AWS Cloud:** `cd projects/web` ➔ `.\deploy-web-s3.ps1 -Action All -Profile idat-cli -Region us-east-2`
+
+---
+
+### 6. ⚙️ Web API Backend .NET Core 10 (`projects/backend/`)
+
+Servicios backend desarrollados en **.NET 10** bajo **Clean Architecture**, preparados para despliegue serverless en AWS Lambda tras API Gateway HTTP API v2:
+
+```text
+projects/backend/
+├── src/
+│   ├── OpsHub.Domain/             # Entidades del dominio, Enums y Value Objects (30 tablas)
+│   ├── OpsHub.Application/        # Casos de uso, interfaces, DTOs y validaciones de negocio
+│   ├── OpsHub.Infrastructure/     # DbContext Pomelo MySQL 8.4, repositorios y servicios AWS S3
+│   └── OpsHub.Api/                # Controladores REST, autenticación JWT, CORS y middleware
+├── deploy-lambda.ps1              # Script PowerShell para empaquetado y despliegue en AWS Lambda
+└── OpsHub.Backend.slnx            # Solución .NET 10
+```
+
+#### Comandos Rápidos de Ejecución:
+* **Compilar Solución:** `dotnet build projects/backend/OpsHub.Backend.slnx`
+* **Iniciar Backend Local:** `dotnet run --project projects/backend/src/OpsHub.Api` (puerto `5000`)
+* **Empaquetar para AWS Lambda:** `cd projects/backend` ➔ `.\deploy-lambda.ps1 -Action Package`
+
+---
+
+### 7. 🎨 Diseños y Prototipado (`design/`)
 
 * [**`design/DESIGN.md`**](design/DESIGN.md): Guía de tokens de diseño, paleta de colores Dark Mode y lineamientos visuales.
 * **`design/stitch_designs/`**: Maquetas interactivas en HTML para previsualización de pantallas.
 
 ---
 
-### 6. 🛠️ Herramientas y Scripts Utilitarios (`tools/`)
+### 8. 🛠️ Herramientas y Scripts Utilitarios (`tools/`)
 
 * **`tools/generate_scrum_proposal_xlsx.py`**: Generador y formateador automatizado del libro Excel de Scrum (Fase 02 - Actividad 02A) con openpyxl.
 * **`tools/generate_report_docx.py`**: Generador automático del informe académico en formato Word utilizando `python-docx`.

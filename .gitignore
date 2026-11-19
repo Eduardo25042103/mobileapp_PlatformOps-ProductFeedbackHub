@@ -15,6 +15,11 @@ web-build/
 .env
 .env*.local
 
+# Proyectos independientes (repositorios externos)
+projects/backend/
+projects/web/
+projects/tunegocio-angular/
+
 # Archivos de sistema y logs
 .DS_Store
 Thumbs.db

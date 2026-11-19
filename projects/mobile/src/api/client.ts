@@ -1,22 +1,27 @@
 import axios from 'axios';
 import { storage } from '../utils/storage';
 
-// Nota: en desarrollo local en emulador Android usa 10.0.2.2; en dispositivo físico usa tu IP local
-export const API_BASE_URL = 'http://10.0.2.2:3000/api/v1';
+// URL en AWS Lambda + Amazon API Gateway v2 HTTP API (Misma que Portal Web Angular)
+export const API_BASE_URL = 'https://193b69gfya.execute-api.us-east-2.amazonaws.com/api/v1';
 
 export const apiClient = axios.create({
   baseURL: API_BASE_URL,
-  timeout: 10000,
+  timeout: 12000,
   headers: {
     'Content-Type': 'application/json',
+    'X-Client-Platform': 'REACT_NATIVE_ANDROID',
   },
 });
 
 apiClient.interceptors.request.use(
   async (config) => {
-    const token = await storage.getToken();
-    if (token && config.headers) {
-      config.headers.Authorization = `Bearer ${token}`;
+    try {
+      const token = await storage.getToken();
+      if (token && config.headers) {
+        config.headers.Authorization = `Bearer ${token}`;
+      }
+    } catch {
+      // Ignora errores de lectura de almacenamiento
     }
     return config;
   },
@@ -26,9 +31,8 @@ apiClient.interceptors.request.use(
 apiClient.interceptors.response.use(
   (response) => response,
   (error) => {
-    // Si la API no está disponible o da error de red, registramos el log
     if (!error.response) {
-      console.warn('Network error or server unreachable:', error.message);
+      console.warn('[Network Error] AWS Backend inalcanzable:', error.message);
     }
     return Promise.reject(error);
   }

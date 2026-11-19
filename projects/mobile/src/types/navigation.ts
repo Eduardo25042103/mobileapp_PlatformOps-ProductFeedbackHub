@@ -8,4 +8,7 @@ export type AppStackParamList = {
   TicketList: { filterPriority?: string; filterStatus?: string } | undefined;
   TicketDetail: { ticketId: string };
   TicketForm: undefined;
+  Clients: undefined;
+  Feedback: undefined;
+  Announcements: undefined;
 };
